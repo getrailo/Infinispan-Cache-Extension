@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<config>
+	<info>
+		<id>10EEC23A-0779-4068-9507A9C5ED4A8699</id>
+		<version>{version}</version>
+		<name>RiakCache</name>
+		<type>server</type>
+		<label>Riak Cache</label>
+		<description>Riak Cache Extension</description>
+		<created>{created}</created> 
+		<category>Core Extension</category>
+		<author>Andrea Campolonghi</author>
+		<image>http://preview.getrailo.org/logos/riak-logo.png</image>
+	</info>
+</config>
+

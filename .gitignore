@@ -1,0 +1,17 @@
+#project
+bin/
+WEB-INF/
+extensions/ext/*.zip
+extensions/bin
+extensions/output/*.*
+extensions/unames.xml
+webroot/extensions/infinispan-cache-extension/bin
+webroot/extensions/infinispan-cache-extension/lib/*.*
+
+#extensions
+*.project
+*.iml
+/.idea
+*.class
+*.DS_Store
+*.classpath
