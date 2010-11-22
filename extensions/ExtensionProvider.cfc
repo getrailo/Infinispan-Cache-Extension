@@ -5,7 +5,7 @@
         <cfset info.title="Local Extension Provider ("&cgi.HTTP_HOST&")">
         <cfset info.mode="develop">
         <cfset info.description="Andrea Campolonghi personal development extensions">
-        <cfset info.image="http://localhost:8888/extensions/logo.jpg">
+        <cfset info.image="http://localhost:8080/extensions/logo.jpg">
         <cfset info.url="http://" & cgi.HTTP_HOST>
     	<cfreturn info>
     </cffunction>
@@ -20,7 +20,7 @@
     	<cfargument name="apps" type="query" required="yes">
         
         <cfset var rootURL=getInfo().url & "/extensions/">
-        <cfset var zipFileLocation = 'ext/riak-cache.zip'>
+        <cfset var zipFileLocation = 'ext/infinispan-cache.zip'>
 		
 		<cffile action="read" file="zip://#expandPath(zipFileLocation)#!/config.xml" variable="config">
 		<cfset info = XMLParse(config)>

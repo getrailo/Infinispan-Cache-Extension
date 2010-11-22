@@ -1,7 +1,7 @@
 <!--- Parameters --->
 <cfset rootURL="http://#CGI.server_name#:#CGI.server_port#/extensions/">
 <cfset root="/extensions">
-<cfset zipFileLocation = 'ext/riak-cache.zip'>
+<cfset zipFileLocation = 'ext/infinispan-cache.zip'>
 
 <!--- Read Config --->
 <cffile action="read" file="zip://#expandPath(zipFileLocation)#!/config.xml" variable="config">

@@ -1,11 +1,11 @@
 <cfcomponent>
 	
 	<cfscript>
-		variables.name = "RiakCache";
-		variables.id = "railo.extension.io.cache.riak.RiakCache";
-		variables.jar = "riak-cache.jar"
-		variables.driver = "RiakCache.cfc"
-		variables.jars = "#variables.jar#,riak-client.jar,protobuf-java-2.3.0.jar,apache-logging-log4j.jar,riak-java-client.txt";
+		variables.name = "InfinispanCache";
+		variables.id = "railo.extension.io.cache.infinispan.InfinispanCache";
+		variables.jar = "infinispan-cache.jar";
+		variables.driver = "InfinispanCache.cfc";
+		variables.jars = "#variables.jar#,infinispan-core.jar,jboss-common-core-2.2.14.GA.jar,jboss-transaction-api-1.0.1.GA.jar,jcip-annotations-1.0.jar,jgroups-2.10.0.GA.jar,log4j-1.2.16.jar,marshalling-api-1.2.3.GA.jar,rhq-pluginAnnotations-1.4.0.B01.jar,river-1.2.3.GA.jar";
 	</cfscript>
     
     <cffunction name="validate" returntype="void" output="no"

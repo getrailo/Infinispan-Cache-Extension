@@ -3,14 +3,14 @@
 	<info>
 		<id>10EEC23A-0779-4068-9507A9C5ED4A8699</id>
 		<version>{version}</version>
-		<name>RiakCache</name>
+		<name>InfiniSpanCache</name>
 		<type>server</type>
-		<label>Riak Cache</label>
-		<description>Riak Cache Extension</description>
+		<label>Infinispan Cache</label>
+		<description>Infinispan Cache Extension</description>
 		<created>{created}</created> 
 		<category>Core Extension</category>
 		<author>Andrea Campolonghi</author>
-		<image>http://preview.getrailo.org/logos/riak-logo.png</image>
+		<image></image>
 	</info>
 </config>
 

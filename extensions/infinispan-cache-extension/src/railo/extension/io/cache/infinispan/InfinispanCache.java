@@ -1,12 +1,10 @@
 package railo.extension.io.cache.infinispan;
 
-import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import railo.commons.io.cache.Cache;
 import railo.commons.io.cache.CacheEntry;
 import railo.commons.io.cache.CacheEntryFilter;
 import railo.commons.io.cache.CacheKeyFilter;
-import railo.runtime.exp.PageException;
 import railo.runtime.type.Struct;
 
 import java.io.IOException;
@@ -21,11 +19,10 @@ import java.util.List;
  */
 public class InfinispanCache implements Cache{
 
-    private EmbeddedCacheManager cm;
+    private EmbeddedCacheManager cm = CacheManagerFactory.getDefaultCacheManager();;
 
     @Override
     public void init(String s, Struct struct) throws IOException {
-         cm = new DefaultCacheManager();
     }
 
     @Override
