@@ -1,12 +1,15 @@
 <cfif server.ColdFusion.ProductName EQ "railo">
 <cflock scope="server" timeout="1">
-	<cfset cacheName="RiakCache">
 	<cfset cacheClear()>
 	
 	<cfset cachePut('abc','123')>
-    <cf_valueEquals left="#cacheCount()#" right="1">
+	<cfcache action="get" name="s" id="abc"/>
+    <cf_valueEquals left="#isDefined('s')#" right="true">
+	
     <cfset cacheDelete('abc')>
-    <cf_valueEquals left="#cacheCount()#" right="0">
+	<cfcache action="get" name="s" id="abc"/>
+    <cf_valueEquals left="#isDefined('s')#" right="false">
+
     <cfset cacheDelete('feg')>
     
     <cftry>
@@ -15,11 +18,9 @@
         <cfcatch></cfcatch>
     </cftry>
     
-    <cfset cachePut('abc','123')>
-    <cf_valueEquals left="#cacheCount()#" right="1">
-    <cfset cacheDelete('abc',false)>
-    <cf_valueEquals left="#cacheCount()#" right="0">
-    <cfset cacheDelete('feg')>
+ 	<cfset cachePut('abc','123')>
+	<cfcache action="get" name="s" id="abc"/>
+    <cf_valueEquals left="#isDefined('s')#" right="true">
     
 </cflock>
 

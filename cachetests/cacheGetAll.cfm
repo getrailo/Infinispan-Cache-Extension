@@ -1,4 +1,4 @@
-<cflock scope="server" timeout="1">
+<!--- <cflock scope="server" timeout="1">
 <cfif server.ColdFusion.ProductName EQ "railo">
 
 	<cfset cacheName="sample">
@@ -14,4 +14,4 @@
     <cf_valueEquals left="#ListSort(StructKeyList(cacheGetAll("ab*")),'textnocase')#" right="ABC,ABD" cs=true>
     <cf_valueEquals left="#ListSort(StructKeyList(cacheGetAll("ab*")),'textnocase')#" right="ABC,ABD" cs=true>
 </cfif>
-</cflock>
+</cflock> --->

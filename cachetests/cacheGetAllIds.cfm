@@ -1,5 +1,5 @@
 
-<cfset server.enableCache=true>
+<!--- <cfset server.enableCache=true>
 <cflock scope="server" timeout="1">
 
 
@@ -18,4 +18,4 @@
     <cf_valueEquals left="#ListSort(arrayToList(cacheGetAllIds("ab*")),'textnocase')#" right="ABC,ABD" cs=true>
     <cf_valueEquals left="#ListSort(arrayToList(cacheGetAllIds("ab*")),'textnocase')#" right="ABC,ABD" cs=true>
 </cfif>
-</cflock>
+</cflock> --->

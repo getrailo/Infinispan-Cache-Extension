@@ -1,13 +1,11 @@
+<!---<cfset cachePut('abc','123')>
+
 <cflock scope="server" timeout="1">
-
-
-	<cfset cacheRemove(arrayToList(cacheGetAllIds()))>
-	
+	<cfset cacheClear()>	
 	<cfset cachePut('abc','123')>
-	<cfset cacheGetMetadata('abc')>
-	
-<cfif server.ColdFusion.ProductName EQ "railo"> 
-	<cfset cachePut('abc','123')>
-	<cfset cacheGetMetadata('abc')>
-</cfif>
-</cflock>
+	<cfset cacheGetMetadata('abc')>		
+	<cfif server.ColdFusion.ProductName EQ "railo"> 
+		<cfset cachePut('abc','123')>
+		<cfset cacheGetMetadata('abc')>
+	</cfif>
+</cflock>--->

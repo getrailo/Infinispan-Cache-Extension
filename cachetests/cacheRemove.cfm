@@ -1,21 +1,37 @@
 <cfset server.enableCache=true>
 
 <cflock scope="server" timeout="10">
-	<cfset cacheName="RiakCache">
-	<cfset cacheRemove(arrayToList(cacheGetAllIds()))>
+	<cfset cacheName="membaseCache">
+	<cfset cacheClear()>
     
 	<cfset cachePut('abc','123')>
 	<cfset cachePut('def','123')>
 	<cfset cachePut('ghi','123')>
     <cfset cacheRemove('abc,def')>
-    <cf_valueEquals left="#arrayToList(cachegetAllIds())#" right="GHI">
-    
-    
+	
+	<cfcache action="get" name="c" id="abc"/>
+    <cf_valueEquals left="#isdefined('c')#" right="false">
+
+	<cfcache action="get" name="c" id="def"/>
+    <cf_valueEquals left="#isdefined('c')#" right="false">
+
+	<cfcache action="get" name="c" id="ghi"/>
+    <cf_valueEquals left="#isdefined('c')#" right="true">
+        
 	<cfset cachePut('abc','123')>
 	<cfset cachePut('def','123')>
 	<cfset cachePut('ghi','123')>
     <cfset cacheRemove(' abc , def ,fff')>
-    <cf_valueEquals left="#arrayToList(cachegetAllIds())#" right="GHI">
+
+	<cfcache action="get" name="c" id="abc"/>
+    <cf_valueEquals left="#isdefined('c')#" right="false">
+
+	<cfcache action="get" name="c" id="def"/>
+    <cf_valueEquals left="#isdefined('c')#" right="false">
+
+	<cfcache action="get" name="c" id="ghi"/>
+    <cf_valueEquals left="#isdefined('c')#" right="true">
+ 
     
     <cftry>
         <cfset cacheRemove(' abc , def ,fff',true)>

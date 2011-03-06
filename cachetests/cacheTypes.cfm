@@ -1,6 +1,6 @@
 
 <cfscript>
-	stItem = {name:"elvis", location:"usa"};
+	stItem = {name="elvis", location="usa"};
 	arrItem = [1,3,5,6,7,6];
 	qry = QueryNew("name,age", "string,int");
 	for(i=0; i<10;i++){
@@ -23,13 +23,7 @@
 	CachePut("query", qry);
 	CachePut("mixed", stItem2);
 	CachePut("obj", cComp);
-/*
-	dump(serialize(stItem));
-	dump(arrItem);
-	dump(qry);	
-	dump(stItem2);
-	dump(cComp);
-*/
+
 	my.Struct = CacheGet("struct");
 	my.Array = CacheGet("array");
 	my.Query = CacheGet("query");

@@ -1,8 +1,8 @@
 <cflock scope="server" timeout="1">
 
 
-	<cfset cacheName="RiakCache">
-	<cfset cacheRemove(arrayToList(cacheGetAllIds()))>
+	<cfset cacheName="membaseCache">
+	<cfset cacheclear()>
 	
 	<cfset cachePut('abc','123')>
 	<cfset cacheGetProperties()>
