@@ -293,14 +293,32 @@ public class InfinispanCache implements Cache {
 	 * @see railo.commons.io.cache.Cache#entries(railo.commons.io.cache.CacheKeyFilter)
 	 */
 	public List entries(CacheKeyFilter filter) {
-		throw notSupported("entries:key filter");
+		List keys = keys();
+		List list=new ArrayList();
+		Iterator it = keys.iterator();
+		String key;
+		while(it.hasNext()){
+			key=(String) it.next();
+			if(filter.accept(key))list.add(getQuiet(key,null));
+		}
+		return list;
 	}
 
 	/**
 	 * @see railo.commons.io.cache.Cache#entries(railo.commons.io.cache.CacheEntryFilter)
 	 */
 	public List entries(CacheEntryFilter filter) {
-		throw notSupported("entries:entry filter");
+		List keys = keys();
+		List list=new ArrayList();
+		Iterator it = keys.iterator();
+		String key;
+		CacheEntry entry;
+		while(it.hasNext()){
+			key=(String) it.next();
+			entry=getQuiet(key,null);
+			if(filter.accept(entry))list.add(entry);
+		}
+		return list;
 	}
 
 	/**
@@ -334,7 +352,16 @@ public class InfinispanCache implements Cache {
 	}
 
 	private RuntimeException notSupported(String feature) {
-		return new RuntimeException("this feature [" + feature + "] is not supported by memcached");
+		return new RuntimeException("this feature [" + feature + "] is not supported by infinispan");
 	}
 
+
+	public CacheEntry getQuiet(String key, CacheEntry defaultValue){
+		try {
+			return getCacheEntry(key);
+		} catch (IOException e) {
+			return defaultValue;
+		}
+	}
+	
 }
