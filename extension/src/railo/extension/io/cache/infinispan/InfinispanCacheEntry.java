@@ -1,99 +1,82 @@
 package railo.extension.io.cache.infinispan;
 
-import java.net.SocketAddress;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
-
-import net.spy.memcached.MemcachedClient;
 
 import railo.commons.io.cache.CacheEntry;
-import railo.loader.engine.CFMLEngine;
+import railo.extension.io.cache.CacheUtil;
 import railo.loader.engine.CFMLEngineFactory;
-import railo.runtime.exp.PageException;
 import railo.runtime.type.Struct;
-import railo.runtime.util.Cast;
 
-public class InfinispanCacheEntry implements CacheEntry {
-	
-	private InfinispanCacheItem item;
-	
-	public InfinispanCacheEntry(InfinispanCacheItem item) {
-		this.item = item;	
+public class InfinispanCacheEntry implements CacheEntry,Serializable {
+
+	private String key;
+	private Object value;
+	private long created;
+	private Long idleTime;
+	private Long until;
+
+	public InfinispanCacheEntry(String key, Object value, Long idleTime, Long until) {
+		this.key=key;
+		this.value=value;
+		this.idleTime=idleTime;
+		this.until=until;
+		this.created=System.currentTimeMillis();
 	}
 
-	@Override
+	/**
+	 * @see railo.commons.io.cache.CacheEntry#created()
+	 */
 	public Date created() {
-		// TODO Auto-generated method stub
-		return null;
+		return CFMLEngineFactory.getInstance().getCreationUtil().createDate(created);
 	}
 
-	@Override
-	public Struct getCustomInfo() {
-		CFMLEngine engine = CFMLEngineFactory.getInstance();
-		Cast caster = engine.getCastUtil();		
-		Struct res = null;
-		try{
-			res = caster.toStruct(this.item.getMc().getStats(this.item.getKey()).get(this.item.getAddresses().get(0)));
-		}catch(PageException e){
-			e.printStackTrace();
-		}
-		return res;
-	}
-
-	@Override
+	/**
+	 * @see railo.commons.io.cache.CacheEntry#getKey()
+	 */
 	public String getKey() {
-		return this.item.getKey();
+		return key;
 	}
 
-	@Override
+	/**
+	 * @see railo.commons.io.cache.CacheEntry#getValue()
+	 */
 	public Object getValue() {
-		return this.item.getValue();
+		return value;
 	}
 
-	@Override
 	public int hitCount() {
-		int hits = 0;
-		
-		MemcachedClient mc = this.item.getMc();
-		Map<SocketAddress,Map<String,String>> stats = mc.getStats(this.item.getKey());
-		SocketAddress add = this.item.getAddresses().get(0);
-	
-		String hitsValue = stats.get(add).get("get_hits");
-		
-		if(hitsValue != null){
-		    hits = Integer.parseInt(hitsValue);			
-		}
-		return hits;
-	}
-
-	@Override
-	public long idleTimeSpan() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
+	public long idleTimeSpan() {
+		if(idleTime==null)return Long.MIN_VALUE;
+		return idleTime.longValue();
+	}
+
 	public Date lastHit() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Date lastModified() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public long liveTimeSpan() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public long size() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public Struct getCustomInfo() {
+		return CacheUtil.getInfo(this);
 	}
 
 }

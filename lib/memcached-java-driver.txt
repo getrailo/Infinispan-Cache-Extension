@@ -1,2 +1,0 @@
-Memcached Java Driver 2.5
-http://code.google.com/p/spymemcached/

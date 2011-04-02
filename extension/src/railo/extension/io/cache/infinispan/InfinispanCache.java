@@ -1,316 +1,340 @@
 package railo.extension.io.cache.infinispan;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
-import net.spy.memcached.AddrUtil;
-import net.spy.memcached.ConnectionFactoryBuilder;
-import net.spy.memcached.MemcachedClient;
+import org.infinispan.manager.CacheContainer;
+import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.manager.EmbeddedCacheManager;
 
 import railo.commons.io.cache.Cache;
 import railo.commons.io.cache.CacheEntry;
 import railo.commons.io.cache.CacheEntryFilter;
 import railo.commons.io.cache.CacheKeyFilter;
-import railo.extension.util.*;
-import railo.loader.engine.CFMLEngine;
+import railo.commons.io.cache.exp.CacheException;
+import railo.extension.io.cache.CacheUtil;
+import railo.extension.io.cache.util.CacheKeyFilterAll;
 import railo.loader.engine.CFMLEngineFactory;
 import railo.runtime.config.Config;
-import railo.runtime.exp.PageException;
 import railo.runtime.type.Struct;
 import railo.runtime.util.Cast;
 
+
 public class InfinispanCache implements Cache {
-	
-	private Functions func = new Functions();
-	private MemcachedClient mc;
-	private List<InetSocketAddress> addrs;
-	private String cacheName;
-	private String host;
-	private Logger log = Logger.getLogger(MemcachedClient.class);
 
-	@Override
+	org.infinispan.Cache<Object, Object> cache = null;
+	private int hits;
+	private int misses;
+
+	public static void init(Config config, String[] cacheNames, Struct[] arguments) throws IOException {
+	}
+
+	/**
+	 * @throws IOException
+	 * @see railo.commons.io.cache.Cache#init(java.lang.String, railo.runtime.type.Struct)
+	 * @deprecated use instead init(Config config,String cacheName,Struct arguments)
+	 */
 	public void init(String cacheName, Struct arguments) throws IOException {
-		this.cacheName = cacheName;
-		CFMLEngine engine = CFMLEngineFactory.getInstance();
-		Cast caster = engine.getCastUtil();
-		
-		log.setLevel(Level.INFO);
-		
-	    try {
-	    	this.host = caster.toString(arguments.get("host"));   
-	    	this.addrs = AddrUtil.getAddresses(this.host);
-        	this.mc = new MemcachedClient(new ConnectionFactoryBuilder().setProtocol(ConnectionFactoryBuilder.Protocol.TEXT).build(),this.addrs);                        
-        	
-        	log.info("Cache id : " + cacheName + " initilized using the Membase Driver");
-        	
-	    } catch (Exception e) {
-            e.printStackTrace();
-        }		
-
-	}
-	
-	public void init(Config config ,String[] cacheName,Struct[] arguments){
-		//Not used at the moment
-	}
-	
-	public List<InetSocketAddress> getAddresses(){
-		return this.addrs;
+		throw new IOException("do not use this init method, use instead init(Config config,String cacheName,Struct arguments)");
+		// no longer used
 	}
 
-	public MemcachedClient getMC(){
-		return this.mc;
-	}
-
-	@Override
-	public boolean contains(String key) {
-		try{
-			getCacheEntry(key);
-			return true;
+	public void init(Config config, String cacheName, Struct arguments) throws IOException {
+		System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOTERRRRSSUUUUS");
+		ClassLoader cl = config.getClassLoader();
+		// debug
+		/*
+		Key[] keys = arguments.keys();
+		for(int i=0;i<keys.length;i++){
+			System.out.println(keys[i]+":"+arguments.get(keys[i],""));
 		}
-		catch(IOException e){
-			return false;
-		}	
-	}
-
-	@Override
-	public List entries() {
-		try{
-			throw(new IOException("The method [entries] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public List entries(CacheKeyFilter arg0) {
-		try{
-			throw(new IOException("The method [entries] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public List entries(CacheEntryFilter arg0) {
-		try{
-			throw(new IOException("The method [entries] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public CacheEntry getCacheEntry(String key) throws IOException {
-		
-		Object obj=null;
-		
-		//try to get the key for max 5 sec
-		Future<Object> f = this.mc.asyncGet(key.toLowerCase());
-			try{		    
-				obj = f.get(5, TimeUnit.SECONDS);
-				if(obj == null){
-					throw(new IOException("Key [" + key + "] was not found"));
+		*/
+		/*
+		Cast cast = CFMLEngineFactory.getInstance().getCastUtil();
+		try {
+			String[] servers;
+			String strServers = cast.toString(arguments.get("servers"), null);
+			// backward comaptibility
+			if (strServers == null) {
+				String host = cast.toString(arguments.get("host"));
+				int port = cast.toIntValue(arguments.get("port"));
+				servers = new String[] { host + ":" + port };
+			} else {
+				strServers = strServers.trim();
+				servers = strServers.split("\\s+");
+				for (int i = 0; i < servers.length; i++) {
+					servers[i] = servers[i].trim();
 				}
-				obj = func.evaluate(obj);
-				InfinispanCacheEntry entry = new InfinispanCacheEntry(new InfinispanCacheItem(this,key,obj));
-				return entry;
-
-				}catch(PageException e){
-					f.cancel(false);
-					throw(new IOException(e.getMessage()));
-				}catch(TimeoutException e) {
-					f.cancel(false);
-					throw(new IOException(e.getMessage()));
-				}catch(InterruptedException e){
-					f.cancel(false);
-					throw(new IOException(e.getMessage()));
-				}catch(ExecutionException e){
-					f.cancel(false);
-					throw(new IOException(e.getMessage()));
 			}
-				
-	}
 
-	@Override
-	public CacheEntry getCacheEntry(String key, CacheEntry filter) {
-		try{
-			throw(new IOException("The method [getCacheEntry(String,CacheEntry)] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
+			// settings
+			int initConn = cast.toIntValue(arguments.get("initial_connections", 1), 1);
+			if (initConn > 0)
+				pool.setInitConn(initConn);
+
+			int minConn = cast.toIntValue(arguments.get("min_spare_connections", 1), 1);
+			if (minConn > 0)
+				pool.setMinConn(minConn);
+
+			int maxConn = cast.toIntValue(arguments.get("max_spare_connections", 32), 32);
+			if (maxConn > 0)
+				pool.setMaxConn(maxConn);
+
+			int maxIdle = cast.toIntValue(arguments.get("max_idle_time", 5), 5);
+			if (maxIdle > 0)
+				pool.setMaxIdle(maxIdle * 1000L);
+
+			int maxBusy = cast.toIntValue(arguments.get("max_busy_time", 30), 30);
+			if (maxBusy > 0)
+				pool.setMaxBusyTime(maxBusy * 1000L);
+
+			int maintSleep = cast.toIntValue(arguments.get("maint_thread_sleep", 5), 5);
+			if (maintSleep > 0)
+				pool.setMaintSleep(maintSleep * 1000L);
+
+			int socketTO = cast.toIntValue(arguments.get("socket_timeout", 3), 3);
+			if (socketTO > 0)
+				pool.setSocketTO(socketTO * 1000);
+
+			int socketConnTO = cast.toIntValue(arguments.get("socket_connect_to", 3), 3);
+			if (socketConnTO > 0)
+				pool.setSocketConnectTO(socketConnTO * 1000);
+
+			pool.setFailover(cast.toBooleanValue(arguments.get("failover", false), false));
+			pool.setFailback(cast.toBooleanValue(arguments.get("failback", false), false));
+			pool.setNagle(cast.toBooleanValue(arguments.get("nagle_alg", false), false));
+			pool.setAliveCheck(cast.toBooleanValue(arguments.get("alive_check", false), false));
+
+			int bufferSize = cast.toIntValue(arguments.get("buffer_size", false));
+			if (bufferSize > 0)
+				pool.setBufferSize(bufferSize * 1024 * 1024);
+
+			// pool.setHashingAlg(SockIOPool.NEW_COMPAT_HASH);
+
+			pool.setServers(servers);
+			pool.initialize();
+		} catch (Exception e) {
+			throw new IOException(e.getMessage());
 		}
-		return null;
+		*/
+		EmbeddedCacheManager manager = new DefaultCacheManager();
+		cache = manager.getCache();
 	}
 
-	@Override
+	/**
+	 * @see railo.commons.io.cache.Cache#contains(java.lang.String)
+	 */
+	public boolean contains(String key) {
+		return cache.containsKey(key);
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#getCustomInfo()
+	 */
 	public Struct getCustomInfo() {
-		CFMLEngine engine = CFMLEngineFactory.getInstance();
-		Cast caster = engine.getCastUtil();
-		Struct res = null;		
-		try{
-			res = caster.toStruct(this.mc.getStats().get(this.addrs.get(0)));	
-		}catch(PageException e){
-			e.printStackTrace();
-		}
-		return res;
+		Struct info = CacheUtil.getInfo(this);
+		return info;
 	}
 
-	@Override
-	public Object getValue(String key) throws IOException {
-		try{
-			CacheEntry entry = getCacheEntry(key);
-			Object result = entry.getValue();
-			Map stats = this.mc.getStats();
-			return result;
-		}catch(IOException e){
-			throw(e);
+	/**
+	 * @see railo.commons.io.cache.Cache#getCacheEntry(java.lang.String)
+	 */
+	public CacheEntry getCacheEntry(String key) throws CacheException {
+		Object value = cache.get(key);
+		if (value == null) {
+			misses++;
+			throw new CacheException("there is no entry with key [" + key + "] in cache");
 		}
-		
+		hits++;
+		return new InfinispanCacheEntry(key, value, null, null);
 	}
 
-	@Override
+	/**
+	 * @see railo.commons.io.cache.Cache#getCacheEntry(java.lang.String, railo.commons.io.cache.CacheEntry)
+	 */
+	public CacheEntry getCacheEntry(String key, CacheEntry defaultValue) {
+		Object value = cache.get(key);
+		if (value == null) {
+			misses++;
+			return defaultValue;
+		}
+		hits++;
+		return new InfinispanCacheEntry(key, value, null, null);
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#getValue(java.lang.String)
+	 */
+	public Object getValue(String key) throws CacheException {
+		Object value = cache.get(key);
+		if (value == null) {
+			misses++;
+			throw new CacheException("there is no entry with key [" + key + "] in cache");
+		}
+		hits++;
+		return value;
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#getValue(java.lang.String, java.lang.Object)
+	 */
 	public Object getValue(String key, Object defaultValue) {
-		try{
-			Object result = getValue(key);
-			if(result == null){
-				return defaultValue;
-			}
-			return result;
-		}catch(IOException e){
-			e.printStackTrace();
-			return null;
+		Object value = cache.get(key);
+		if (value == null) {
+			misses++;
+			return defaultValue;
 		}
+		hits++;
+		return value;
 	}
 
-	@Override
+	/**
+	 * @see railo.commons.io.cache.Cache#hitCount()
+	 */
 	public long hitCount() {
-		Map<SocketAddress,Map<String,String>> stats = this.mc.getStats();
-		SocketAddress add = this.addrs.get(0);
-	    long hits = Long.parseLong(stats.get(add).get("get_hits"));
 		return hits;
 	}
 
-	@Override
-	public List keys() {
-		try{
-			throw(new IOException("The method [keys] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public List keys(CacheKeyFilter arg0) {
-		try{
-			throw(new IOException("The method [keys] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public List keys(CacheEntryFilter arg0) {
-		try{
-			throw(new IOException("The method [keys] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
+	/**
+	 * @see railo.commons.io.cache.Cache#missCount()
+	 */
 	public long missCount() {
-		Map<SocketAddress,Map<String,String>> stats = this.mc.getStats();
-		SocketAddress add = this.addrs.get(0);
-	    long misses = Long.parseLong(stats.get(add).get("get_misses"));
 		return misses;
 	}
 
-	@Override
-	public void put(String key, Object value, Long idleTime, Long lifeSpan) {
-		Object obj = null;
-		long span = lifeSpan==null?0:lifeSpan;
-		int seconds = (int)TimeUnit.MILLISECONDS.toSeconds(span);
-		
-		try{
-			obj = func.serialize(value);			
+	/**
+	 * @see railo.commons.io.cache.Cache#put(java.lang.String, java.lang.Object, java.lang.Long, java.lang.Long)
+	 */
+	public void put(String key, Object value, Long idleTime, Long until) {
+		if (until == null) {
+			cache.put(key, value);
+		} else {
+			cache.put(key, value, until.longValue() + System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 		}
-		catch(PageException e){
-			e.printStackTrace();
-		}
-		this.mc.set(key.toLowerCase(),seconds,obj);
+
 	}
 
-	@Override
+	/**
+	 * @see railo.commons.io.cache.Cache#remove(java.lang.String)
+	 */
 	public boolean remove(String key) {
-		this.mc.delete(key.toLowerCase());
-		return false;
+		if (cache.containsKey(key)) {
+			cache.remove(key);
+			return true;
+		} else
+			return false;
+
 	}
 
-	@Override
+	// not supported
+
+	/**
+	 * @see railo.commons.io.cache.Cache#remove(railo.commons.io.cache.CacheKeyFilter)
+	 */
 	public int remove(CacheKeyFilter filter) {
-		
-		// Does not really test nothing here. Just flush the whole cache.
-		// Memcached does not yes support the keys listing so is not possible to iterate
-		
-		this.mc.flush();
-		
-		return 0;
+		if (CacheKeyFilterAll.equalTo(filter)) {
+			cache.clear();
+			return -1;
+		}
+		throw notSupported("remove:key filter");
 	}
 
-	@Override
-	public int remove(CacheEntryFilter arg0) {
-
-		// Does not really test nothing here. Just flush the whole cache.
-		// Memcached does not yes support the keys listing so is not possible to iterate
-		
-		this.mc.flush();
-		
-		return 0;
+	public void clear() {
+		cache.clear();
 	}
 
-	@Override
+	/**
+	 * @see railo.commons.io.cache.Cache#remove(railo.commons.io.cache.CacheEntryFilter)
+	 */
+	public int remove(CacheEntryFilter filter) {
+		throw notSupported("remove:entry filter");
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#values()
+	 */
 	public List values() {
-		try{
-			throw(new IOException("The method [values] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return null;
+		throw notSupported("values");
 	}
 
-	@Override
-	public List values(CacheKeyFilter arg0) {
-		try{
-			throw(new IOException("The method [values] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return null;
+	/**
+	 * @see railo.commons.io.cache.Cache#values(railo.commons.io.cache.CacheKeyFilter)
+	 */
+	public List values(CacheKeyFilter filter) {
+		throw notSupported("entries:key filter");
 	}
 
-	@Override
-	public List values(CacheEntryFilter arg0) {
-		try{
-			throw(new IOException("The method [values] is not supported in Membase Cache"));			
-		}catch(IOException e){
-			e.printStackTrace();
+	/**
+	 * @see railo.commons.io.cache.Cache#values(railo.commons.io.cache.CacheEntryFilter)
+	 */
+	public List values(CacheEntryFilter filter) {
+		throw notSupported("values:entry filter");
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#entries()
+	 */
+	public List entries() {
+		List keys = keys();
+		List list=new ArrayList();
+		Iterator it = keys.iterator();
+		String key;
+		while(it.hasNext()){
+			key=(String) it.next();
+			list.add(cache.get(key));
 		}
-		return null;
+		return list;
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#entries(railo.commons.io.cache.CacheKeyFilter)
+	 */
+	public List entries(CacheKeyFilter filter) {
+		throw notSupported("entries:key filter");
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#entries(railo.commons.io.cache.CacheEntryFilter)
+	 */
+	public List entries(CacheEntryFilter filter) {
+		throw notSupported("entries:entry filter");
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#keys()
+	 */
+	public List keys() {
+		List<Object> list = new ArrayList(cache.keySet());
+		return list;
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#keys(railo.commons.io.cache.CacheKeyFilter)
+	 */
+	public List keys(CacheKeyFilter filter) {
+		List keys = keys();
+		List list=new ArrayList();
+		Iterator it = keys.iterator();
+		String key;
+		while(it.hasNext()){
+			key=(String) it.next();
+			if(filter.accept(key))list.add(key);
+		}
+		return list;
+	}
+
+	/**
+	 * @see railo.commons.io.cache.Cache#keys(railo.commons.io.cache.CacheEntryFilter)
+	 */
+	public List keys(CacheEntryFilter filter) {
+		throw notSupported("keys: entry filter");
+	}
+
+	private RuntimeException notSupported(String feature) {
+		return new RuntimeException("this feature [" + feature + "] is not supported by memcached");
 	}
 
 }
