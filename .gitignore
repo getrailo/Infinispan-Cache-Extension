@@ -8,13 +8,9 @@ test.cfm
 WEB-INF/
 
 #extensions
-*.project
 *.class
 *.DS_Store
-*.classpath
 /.settings
-*.classpath
-*.project
 *.iml
 /.idea
 

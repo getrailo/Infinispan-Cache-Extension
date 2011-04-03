@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="extension/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Railo-Debug"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Railo-Core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Railo-Loader"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Railo-Libs"/>
+	<classpathentry kind="lib" path="lib/infinispan-core.jar"/>
+	<classpathentry kind="lib" path="lib/jboss-transaction-api-1.0.1.GA.jar"/>
+	<classpathentry kind="lib" path="lib/jcip-annotations-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jgroups-2.12.0.CR5.jar"/>
+	<classpathentry kind="lib" path="lib/marshalling-api-1.2.3.GA.jar"/>
+	<classpathentry kind="lib" path="lib/rhq-pluginAnnotations-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/river-1.2.3.GA.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
