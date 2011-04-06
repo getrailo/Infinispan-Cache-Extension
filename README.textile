@@ -1,3 +1,15 @@
-h2. Railo Infinispan Cache (memcached protocol)
+h2. Railo Infinispan Caches
 
 p. Copyright Railo Technologies GmbH, Switzerland
+
+p. To run tests, modify ./build-cfd/build.xml to set the cache type to test, then:
+
+cd ./build-cfd
+ant build
+ant server.start.fg
+
+Which will fire up a server on the first available port.  Watch the end of the output for the port number
+
+http://localhost:$port/
+
+Will run the cache test. 

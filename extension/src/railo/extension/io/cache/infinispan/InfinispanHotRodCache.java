@@ -13,7 +13,9 @@ import org.infinispan.manager.CacheContainer;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
+import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.client.hotrod.VersionedValue;
 
 import railo.commons.io.cache.Cache;
 import railo.commons.io.cache.CacheEntry;
@@ -30,7 +32,7 @@ import railo.runtime.util.Cast;
 
 public class InfinispanHotRodCache implements Cache {
 
-	org.infinispan.Cache<Object, Object> cache = null;
+	RemoteCache<Object, Object> cache = null;
 	private int hits;
 	private int misses;
 
@@ -48,7 +50,6 @@ public class InfinispanHotRodCache implements Cache {
 	}
 
 	public void init(Config config, String cacheName, Struct arguments) throws IOException {
-		System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOTERRRRSSUUUUS");
 		ClassLoader cl = config.getClassLoader();
 		// debug
 		/*
@@ -128,7 +129,7 @@ public class InfinispanHotRodCache implements Cache {
 		ClassLoader ocl = Thread.currentThread().getContextClassLoader();
 	    Thread.currentThread().setContextClassLoader(cl);
 		RemoteCacheManager manager = new RemoteCacheManager();
-		
+		manager.start();
 		cache = manager.getCache();
 
 		Thread.currentThread().setContextClassLoader(ocl);
@@ -232,7 +233,8 @@ public class InfinispanHotRodCache implements Cache {
 	 */
 	public boolean remove(String key) {
 		if (cache.containsKey(key)) {
-			cache.remove(key);
+			VersionedValue ve = cache.getVersioned(key);
+			cache.removeWithVersion(key, ve.getVersion());
 			return true;
 		} else
 			return false;

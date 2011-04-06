@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/marshalling-api-1.2.3.GA.jar"/>
 	<classpathentry kind="lib" path="lib/rhq-pluginAnnotations-3.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/river-1.2.3.GA.jar"/>
+	<classpathentry kind="lib" path="lib/infinispan-client-hotrod.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,17 @@
+BASE:
+infinispan-core.jar
+jboss-transaction-api-1.0.1.GA.jar
+jcip-annotations-1.0.jar
+jgroups-2.12.0.CR5.jar
+marshalling-api-1.2.3.GA.jar
+rhq-pluginAnnotations-3.0.1.jar
+river-1.2.3.GA.jar
+
+HOTROD:
+commons-pool-1.5.4.jar
+jackson-core-asl-1.6.1.jar
+jackson-mapper-asl-1.6.1.jar
+paranamer-2.2.jar
+paranamer-ant-2.2.jar
+paranamer-generator-2.2.jar
+qdox-1.10.1.jar
