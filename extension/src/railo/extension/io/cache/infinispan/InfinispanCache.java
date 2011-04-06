@@ -6,10 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.infinispan.manager.CacheContainer;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
-
 import railo.commons.io.cache.Cache;
 import railo.commons.io.cache.CacheEntry;
 import railo.commons.io.cache.CacheEntryFilter;
@@ -17,10 +15,8 @@ import railo.commons.io.cache.CacheKeyFilter;
 import railo.commons.io.cache.exp.CacheException;
 import railo.extension.io.cache.CacheUtil;
 import railo.extension.io.cache.util.CacheKeyFilterAll;
-import railo.loader.engine.CFMLEngineFactory;
 import railo.runtime.config.Config;
 import railo.runtime.type.Struct;
-import railo.runtime.util.Cast;
 
 
 public class InfinispanCache implements Cache {
@@ -43,7 +39,6 @@ public class InfinispanCache implements Cache {
 	}
 
 	public void init(Config config, String cacheName, Struct arguments) throws IOException {
-		System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOTERRRRSSUUUUS");
 		ClassLoader cl = config.getClassLoader();
 		// debug
 		/*
@@ -120,8 +115,15 @@ public class InfinispanCache implements Cache {
 			throw new IOException(e.getMessage());
 		}
 		*/
+		ClassLoader ocl = Thread.currentThread().getContextClassLoader();
+		System.out.println("TCCL is " + ocl);
+	    Thread.currentThread().setContextClassLoader(cl);
+	    System.out.println("TCCL is " + cl);
 		EmbeddedCacheManager manager = new DefaultCacheManager();
 		cache = manager.getCache();
+	    Thread.currentThread().setContextClassLoader(ocl);
+		//EmbeddedCacheManager manager = new DefaultCacheManager();
+		
 	}
 
 	/**

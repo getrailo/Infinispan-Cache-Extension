@@ -13,6 +13,7 @@ import org.infinispan.manager.CacheContainer;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
+import org.infinispan.client.hotrod.RemoteCacheManager;
 
 import railo.commons.io.cache.Cache;
 import railo.commons.io.cache.CacheEntry;
@@ -27,7 +28,7 @@ import railo.runtime.type.Struct;
 import railo.runtime.util.Cast;
 
 
-public class InfinispanHotRod implements Cache {
+public class InfinispanHotRodCache implements Cache {
 
 	org.infinispan.Cache<Object, Object> cache = null;
 	private int hits;
@@ -124,15 +125,13 @@ public class InfinispanHotRod implements Cache {
 			throw new IOException(e.getMessage());
 		}
 		*/
-		GlobalConfiguration gc = GlobalConfiguration.getClusteredDefault();
-		gc.setClusterName("demoCluster");
-		Configuration c = new Configuration();
-		//Distributed cache mode
-		c.setCacheMode(Configuration.CacheMode.DIST_SYNC);
-		EmbeddedCacheManager manager = new DefaultCacheManager(gc, c,false);
-		//EmbeddedCacheManager manager = new DefaultCacheManager();
+		ClassLoader ocl = Thread.currentThread().getContextClassLoader();
+	    Thread.currentThread().setContextClassLoader(cl);
+		RemoteCacheManager manager = new RemoteCacheManager();
 		
 		cache = manager.getCache();
+
+		Thread.currentThread().setContextClassLoader(ocl);
 	}
 
 	/**

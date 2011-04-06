@@ -123,13 +123,14 @@ public class InfinispanClusterCache implements Cache {
 			throw new IOException(e.getMessage());
 		}
 		*/
+		ClassLoader ocl = Thread.currentThread().getContextClassLoader();
+	    Thread.currentThread().setContextClassLoader(cl);
 		GlobalConfiguration gc = GlobalConfiguration.getClusteredDefault();
 		gc.setClusterName("demoCluster");
+		//gc.setClusterName("demoCluster");
 		gc.setTransportClass(JGroupsTransport.class.getName());
-		 
 		//Load the jgroups properties
 		Properties p = new Properties();
-		p.setProperty("configurationFile","jgroups-udp.xml");
 		gc.setTransportProperties(p);
 		 
 		Configuration c = new Configuration();
@@ -151,6 +152,7 @@ public class InfinispanClusterCache implements Cache {
 		//EmbeddedCacheManager manager = new DefaultCacheManager();
 		
 		cache = manager.getCache();
+	    Thread.currentThread().setContextClassLoader(ocl);
 	}
 
 	/**
