@@ -608,7 +608,53 @@
 				</antcontrib:if>
 		</sequential>
 	</macrodef>	
+	
+	<macrodef name="railo-cache">
+		<attribute name="name"/>
+		<attribute name="class"/>
+		<attribute name="custom"/>
+		<sequential>
+			<antcontrib:if>
+				<equals arg1="${default.cfengine}" arg2="railo" />
+				<then>
+					<antcontrib:var name="some.cache.exists" unset="true" />
+					<xmltask source="${railo.config.file}" dest="${railo.config.file}">
+						<xmlcatalog refId="commonDTDs" />
+						<copy path="/railo-configuration/cache/text()" property="some.cache.exists" />
+						<!-- if no caches at all, just insert -->
+						<insert path="//railo-configuration" position="under" unless="some.cache.exists">
+							<![CDATA[<cache default-object="@{name}"><connection class="@{class}" custom="@{custom}" name="@{name}" read-only="false" storage="false"/></cache>]]>
+						</insert>
+						<copy path="/railo-configuration/cache/connection[@name='@{name}']/@name" attrValue="true" property="cache.exists" />
+						<replace path="/railo-configuration/cache/connection[@name='@{name}']/text()" if="cache.exists">
+							<![CDATA[
+							<connection class="@{class}" custom="@{custom}" name="@{name}" read-only="false" storage="false"/>
+		  					]]>
+		  					</replace>
+						<insert path="/railo-configuration/cache" position="under" unless="cache.exists">
+							<![CDATA[
+							<connection class="@{class}" custom="@{custom}" name="@{name}" read-only="false" storage="false"/>
+		  					]]>
+	  					</insert>
+					</xmltask>
+					<!-- if some caches exist we can update and add -->
+					<antcontrib:switch value="${cache.exists}">
+						<case value="true">
+							<echo message="updated cache provider @{name}" />
+						</case>
+						<default>
+							<echo message="added cache provider @{name}" />
+						</default>
+					</antcontrib:switch>
+				</then>
+				<else>
+					<echo> *** cache providers are useless for ${default.cfengine} hombre!</echo>
+				</else>
+			</antcontrib:if>
+		</sequential>
+	</macrodef>	
 
+	
 	<macrodef name="railo-mapping-remove">
 		<attribute name="virtual" />
 		<sequential>

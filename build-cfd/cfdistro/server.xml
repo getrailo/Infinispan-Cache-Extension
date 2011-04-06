@@ -19,7 +19,7 @@
 	<property name="deploy.remote.keyfile" value=""/>
 	<property name="deploy.remote.dir" value="./"/>
 	<property name="server.memory.max" value="256M"/>
-	<property name="server.jvm.args" value="-Xms${server.memory.max} -Xmx${server.memory.max} -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=128m -XX:MaxPermSize=128m -Dsun.rmi.dgc.client.gcInterval=600000 -Dsun.rmi.dgc.server.gcInterval=600000" />
+	<property name="server.jvm.args" value="-Xms${server.memory.max} -Xmx${server.memory.max} -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=128m -XX:MaxPermSize=128m -Dsun.rmi.dgc.client.gcInterval=600000 -Dsun.rmi.dgc.server.gcInterval=600000 -Djava.net.preferIPv4Stack=true" />
 
 	<import file="containers/jboss/jboss.xml" />
 	<import file="containers/tomcat/tomcat.xml" />
