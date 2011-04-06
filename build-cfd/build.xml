@@ -1,9 +1,14 @@
 <project name="distro.build" default="build" basedir="./" xmlns:antcontrib="antlib:net.sf.antcontrib">
 
 	<loadproperties srcfile="build.properties"/>
+	<property name="cache.type" value="Cluster" />
+<!--
+	<property name="cache.type" value="" />
+	<property name="cache.type" value="HotRod" />
+-->
 	<import file="${cfdistro.build.file}"/>
 
-	<target name="build" depends="src.to.mappings.xml,startscripts.create,cfdistro.build">
+	<target name="build" depends="cfdistro.build,createJar">
 		<!-- add mappings -->
 		<!--
 		<mapping physical="${basedir}/../../docs" virtual="/docs"/>
@@ -19,6 +24,7 @@
 		-->
 		<!-- add urlrewrite filter and rewrite rules -->
 		<!-- getting "Failed to specify text in replace" means you need to escape & like so:  &amp;amp;-->
+		<!-- you can also juse create a urlrewrites.xml file in build dir-->
 		<!--
 		<antcontrib:runtarget target="urlrewritefilter.servlet.install" />
 		<urlrewrite name="root" note="MAP / TO DEFAULT VIEW" 
@@ -28,8 +34,38 @@
 		<urlrewriteout name="pubToRoot" from="^/pub/(.*)" to="/$1"/>
 		<urlrewriteout name="rootToContextPath" from="/(.*)" to="%{context-path}/$1" type="forward"/>
 		-->
+	    
+		<railo-cache name="infinispan" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" 
+	    	custom="maint_thread_sleep=5&amp;amp;alive_check=true&amp;amp;initial_connections=1&amp;amp;failback=true&amp;amp;max_busy_time=30&amp;amp;socket_connect_to=3&amp;amp;buffer_size=1&amp;amp;nagle_alg=true&amp;amp;max_idle_time=600&amp;amp;failover=true&amp;amp;max_spare_connections=32&amp;amp;servers=&amp;amp;socket_timeout=30&amp;amp;min_spare_connections=1"/>
+		
+		<copy todir="${war.target.dir}/WEB-INF/railo/lib/">
+		    <fileset dir="../lib" includes="*.jar"/>
+		</copy>
+		<copy todir="${war.target.dir}/WEB-INF/railo/context/admin/cdriver/">
+            <fileset dir="../extension/driver" includes="*cfc"/>
+		</copy>
+
 	</target>	
 
+	<target name="createJar">
+		<path id="master-classpath">
+			<fileset dir="../../railo/">
+				<include name="*.jar"/>
+			 </fileset>
+            <fileset dir="../../lib/">
+                <include name="*.jar"/>
+             </fileset>
+			 <fileset dir="lib/">
+			    <include name="*.jar"/>
+			  </fileset>	
+		</path>
+		<javac srcdir="${basedir}/../extension/src" destdir="${basedir}/../bin" >
+			 <classpath refid="master-classpath"/>
+		</javac>
+		<jar basedir="${basedir}/../bin" destfile="${war.target.dir}/WEB-INF/railo/lib/infinispan-cache.jar" />
+	</target>
+	
+	
 	<!-- these are just here for the Eclipse Ant UI ordering -->
 	<target name="build.start.launch">
 		<antcontrib:runtarget target="cfdistro.build.start.launch" />
