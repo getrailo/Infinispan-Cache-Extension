@@ -10,7 +10,10 @@
 
 	<property name="jboss.server" value="default" />
 	<property name="jboss.version" value="5.1.0.GA" />
-	<property name="jboss.dir" location="${temp.dir}/server/jboss${jboss.version}" />
+	<property name="jboss.dir" location="${basedir}/jboss${jboss.version}" />
+	<property name="jboss.dir.absolute" location="${jboss.dir}" />
+	<antcontrib:var name="jboss.dir" unset="true" />
+	<property name="jboss.dir" location="${jboss.dir.absolute}" />
 	<property name="jboss.server.dir" value="${jboss.dir}/server/${jboss.server}"/>
 	<property name="jboss.host" value="${server.host}"/>
 	<property name="ext.jboss.dir" location="${ext.dir}/jboss/${jboss.version}" />
@@ -157,6 +160,12 @@
 		</xmltask>
 		<echo message="${jboss.deploy.dir}"/>
 		<echo message="${server.deploy.dir}"/>
+		<antcontrib:if>
+			<equals arg1="${war.contextpath}" arg2="/" />
+			<then>
+				<delete dir="${jboss.server.dir}/deploy/ROOT.war"/>
+			</then>
+		</antcontrib:if>
 	</target>
 
 	<target name="jboss.start" depends="jboss.install">
