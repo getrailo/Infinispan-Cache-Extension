@@ -123,36 +123,9 @@ public class InfinispanClusterCache implements Cache {
 			throw new IOException(e.getMessage());
 		}
 		*/
-		ClassLoader ocl = Thread.currentThread().getContextClassLoader();
-	    Thread.currentThread().setContextClassLoader(cl);
-		GlobalConfiguration gc = GlobalConfiguration.getClusteredDefault();
-		gc.setClusterName("demoCluster");
-		//gc.setClusterName("demoCluster");
-		gc.setTransportClass(JGroupsTransport.class.getName());
-		//Load the jgroups properties
-		Properties p = new Properties();
-		gc.setTransportProperties(p);
-		 
-		Configuration c = new Configuration();
-		//Distributed cache mode
-		c.setCacheMode(Configuration.CacheMode.DIST_SYNC);
-		c.setExposeJmxStatistics(true);
-		 
-		// turn functionality which returns the previous value when setting
-		c.setUnsafeUnreliableReturnValues(true);
-		 
-		//data will be distributed over 3 nodes
-		c.setNumOwners(3);
-		c.setL1CacheEnabled(true);
-		 
-		//Allow batching
-		c.setInvocationBatchingEnabled(true);
-		c.setL1Lifespan(6000000);
-		EmbeddedCacheManager manager = new DefaultCacheManager(gc, c,false);
-		//EmbeddedCacheManager manager = new DefaultCacheManager();
 		
-		cache = manager.getCache();
-	    Thread.currentThread().setContextClassLoader(ocl);
+		//EmbeddedCacheManager manager = new DefaultCacheManager();
+		cache = EmbeddedCacheInstance.getInstance(cl).getCache(cacheName);
 	}
 
 	/**
