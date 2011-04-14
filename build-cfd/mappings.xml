@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 <mappings>
-  <mapping physical="@src.dir@/" virtual="/"></mapping>
+  <mapping physical="@src.dir@/stress" virtual="/stress"></mapping>
 </mappings>
 
