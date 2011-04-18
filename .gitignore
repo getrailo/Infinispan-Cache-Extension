@@ -5,7 +5,6 @@ extension/bin/
 extension/lib/
 extension/config.xml
 test.cfm
-WEB-INF/
 
 #extensions
 *.class
