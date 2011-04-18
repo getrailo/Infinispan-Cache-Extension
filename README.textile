@@ -4,7 +4,7 @@ p. Copyright Railo Technologies GmbH, Switzerland
 
 p. To run tests, modify ./build-cfd/build.xml to set the cache type to test, then:
 
-cd ./build-cfd
+cd ./build
 ant build
 ant server.start.fg
 
@@ -12,4 +12,42 @@ Which will fire up a server on the first available port.  Watch the end of the o
 
 http://localhost:$port/
 
-Will run the cache test. 
+Will run the cache test.
+
+h2. other options
+
+|._sdf |._wee|
+|hello | there |
+
+*The magic happens in ./build  "./" below refers to ./build* 
+* "build/cfdistro.sh" == "ant" cept it doesn't use -D.  Ex:
+** ant server.start -Dserver.port.http=8787 -Drunwar.stop.port=8765
+** ./cfdistro.sh server.start server.port.http=8787 runwar.stop.port=8765
+
+_#run the server in the forground on a certain port:_
+cfdistro.sh server.start.fg server.port.http=8787
+
+_#run the server in the background on a certain port, stop on other port:_
+./cfdistro.sh server.start.fg server.port.http=8787 runwar.stop.port=8765
+
+_#install infinispan:_
+./cfdistro.sh infinispan.install
+
+_#install jboss to ./jboss:_
+./cfdistro.sh server.install build.type=jboss
+
+_#install jboss to ./jboss1 and ./jboss2 with a port offset of 100 on jboss2:_
+./cfdistro.sh server.install build.type=jboss
+
+_#create an exploded railo-infinispan.war in ./war_
+./cfdistro.sh build
+
+_#jar the exploded war_
+./cfdistro.sh jar.war
+
+_#create a distributable zip of all this stuff (be sure to delete any jboss installs first)_
+./cfdistro.sh cfdistro.dist dist.type=src
+
+_#see something long and complicated (OS X only)
+./cfdistro.sh runwar.
+

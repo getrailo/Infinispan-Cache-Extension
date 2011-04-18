@@ -46,12 +46,12 @@
 		<taskdef name="mxunittask" classname="org.mxunit.ant.MXUnitAntTask" classpath="lib/mxunit-ant.jar" />
 	-->
 
-	<!--
 	<macrodef name="load-buildtype-properties">
 		<attribute name="buildtype"/>
 		<sequential>
 			<antcontrib:trycatch>
-				<try note="do it twice to catch any already defined deals">
+				<try>
+					<!-- note="do it twice to catch any already defined deals" -->
 					<antcontrib:var file="${basedir}/build.@{buildtype}.properties" />
 					<antcontrib:var file="${basedir}/build.@{buildtype}.properties" />
 					<echo message="loaded custom properties: build.@{buildtype}.properties"/>
@@ -60,6 +60,7 @@
 		</sequential>
 	</macrodef>
 	<load-buildtype-properties buildtype="${build.type}" />
+	<!--
 	-->
 
 	<antcontrib:if>
@@ -244,6 +245,7 @@
 	<import file="server.xml" />
 	<import file="build-dmg.xml" />
 	<import file="installer/build.xml" />
+	<import file="cache/infinispan.xml" />
 	<import file="httpd/build.xml" />
 	<import file="httpd/nginx.xml" />
 	<import file="httpd/lighttpd.xml" />
@@ -376,6 +378,7 @@
 		<mkdir dir="${temp.dir}" />
 		<!-- tomcat -->
 		<mkdir dir="${war.target.dir}/META-INF" />
+		<echo file="${war.target.dir}/META-INF/jboss-deployment-structure.xml"><![CDATA[<jboss-deployment-structure><extended-class-visibility>true</extended-class-visibility><deployment name="${war.name}.war"><child-first>false</child-first></deployment></jboss-deployment-structure>]]></echo>
 		<echo file="${war.target.dir}/META-INF/context.xml">
 			<![CDATA[<Context path="${war.contextpath}" override="true" docBase="./" />]]></echo>
 		<!-- jboss -->
@@ -605,6 +608,9 @@
 		<element name="args" optional="true" />
 		<sequential>
 			<antcontrib:var name="some.mapping.exists" unset="true" />
+			<antcontrib:var name="mapping.physical.rel" unset="true" />
+			<property name="mapping.physical.rel" value="@{physical}" relative="yes" basedir="${war.target.dir}"/>
+			<echo message="RRRRRRRRRRRRRREEELLLLLL: ${mapping.physical.rel}" />
 			<antcontrib:var name="mapping.exists" unset="true" />
 			<xmltask source="${mappings.file}" dest="${mappings.file}">
 				<xmlcatalog refId="commonDTDs" />
@@ -612,44 +618,43 @@
 				<!-- if no mappings at all, just insert -->
 				<insert path="/mappings" position="under" unless="some.mapping.exists">
 					<![CDATA[
-  						<mapping physical="@{physical}" virtual="@{virtual}"/>
+  						<mapping physical="${mapping.physical.rel}" virtual="@{virtual}"/>
   					]]>
 				</insert>
 				<!-- if some mappings exist we can update and add -->
 				<copy path="/mappings/mapping[@virtual='@{virtual}']/@virtual" attrValue="true" property="mapping.exists" />
 				<replace path="/mappings/mapping[@virtual=@{virtual}]/text()" if="mapping.exists">
 					<![CDATA[
-  						<mapping physical="@{physical}" virtual="@{virtual}"/>
+  						<mapping physical="${mapping.physical.rel}" virtual="@{virtual}"/>
   					]]>
   					</replace>
 				<insert path="/mappings" position="under" unless="mapping.exists">
 					<![CDATA[
-  						<mapping physical="@{physical}" virtual="@{virtual}"/>
+  						<mapping physical="${mapping.physical.rel}" virtual="@{virtual}"/>
   					]]>
 				</insert>
 			</xmltask>
 			<antcontrib:switch value="${mapping.exists}">
 				<case value="@{virtual}">
-					<echo message="mappings.xml [updated] - @{virtual}	 @{physical}" />
+					<echo message="mappings.xml [updated] - @{virtual}	@{physical} (${mapping.physical.rel})" />
 				</case>
 				<default>
-					<echo message="mappings.xml [added] - @{virtual} 	@{physical}" />
+					<echo message="mappings.xml [added] - @{virtual} 	@{physical} (${mapping.physical.rel})" />
 				</default>
 			</antcontrib:switch>
 			<antcontrib:if>
 				<available file="${war.target.dir}" />
 				<then>
-					<antcontrib:var name="mapping.physical" unset="true" />
 					<replace-attributes string="@{physical}" propertyname="mapping.physical" />
 					<antcontrib:switch value="${default.cfengine}">
 						<case value="railo">
-							<railo-mapping physical="${mapping.physical}" virtual="@{virtual}" />
+							<railo-mapping physical="${mapping.physical.rel}" virtual="@{virtual}" />
 						</case>
 						<case value="acf">
-							<acf-mapping physical="${mapping.physical}" virtual="@{virtual}" />
+							<acf-mapping physical="${mapping.physical.rel}" virtual="@{virtual}" />
 						</case>
 						<case value="obd">
-							<obd-mapping physical="${mapping.physical}" virtual="@{virtual}" />
+							<obd-mapping physical="${mapping.physical.rel}" virtual="@{virtual}" />
 						</case>
 						<default>
 							<fail message="Um, the cfml engine '${default.cfengine}' is unknown to me, esse!" />
@@ -860,10 +865,11 @@
 	<equals arg1="${exists.mappings.xml}" arg2="true" />
 	<then>
 		<echo message="Mapping file exists : ${mappings.file} " />
+		<property name="src.dir.rel" value="${src.dir}" relative="yes" basedir="${war.target.dir}"/>
 		<loadfile property="mappings.xml" srcFile="${mappings.file}">
 			<filterchain>
 				<filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-					<param type="token" name="src.dir" value="${src.dir}" />
+					<param type="token" name="src.dir" value="${src.dir.rel}" />
 					<param type="token" name="war.target.dir" value="${war.target.dir}" />
 				</filterreader>
 			</filterchain>

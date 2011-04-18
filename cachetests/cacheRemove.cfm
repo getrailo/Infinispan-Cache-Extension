@@ -1,7 +1,7 @@
 <cfset server.enableCache=true>
 
 <cflock scope="server" timeout="10">
-	<cfset cacheName="membaseCache">
+	<cfset cacheName="infinispan">
 	<cfset cacheClear()>
     
 	<cfset cachePut('abc','123')>

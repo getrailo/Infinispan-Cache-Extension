@@ -1,6 +1,6 @@
 <cfif server.ColdFusion.ProductName EQ "railo">
 <cflock scope="server" timeout="1">
-	<cfset cacheName="membaseCache">
+	<cfset cacheName="infinispan">
 	<cfset cacheClear()>
 	
 	<cfset cachePut('abc','123')>

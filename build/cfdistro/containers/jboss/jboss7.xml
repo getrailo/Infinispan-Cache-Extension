@@ -3,13 +3,14 @@
 	<property name="server.deploy.dir" location="${jboss.dir}/webapps"/>
 	<property name="server.log.dir" value="${jboss.dir}/logs/"/>
 	<property name="server.host" value="localhost"/>
+	<property name="server.ip" value="127.0.0.1"/>
 	<property name="server.port" value="8080"/>
 	<property name="server.port.http" value="8080"/>
 	<property name="server.port.ajp" value="8009"/>
 	<property name="server.maxmemory" value="256M"/>
 
 	<property name="jboss.version.major" value="7.0" />
-	<property name="jboss.version" value="5.1.0.GA" />
+	<property name="jboss.version" value="7.0.0.Beta3-SNAPSHOT" />
 	<property name="jboss.server" value="default" />
 	
 	<property name="jboss.dir" location="${basedir}/jboss${jboss.version}" />
@@ -18,19 +19,15 @@
 	<antcontrib:var name="jboss.dir" unset="true" />
 	<property name="jboss.dir" location="${jboss.dir.absolute}" />
 	<property name="jboss.server.dir" value="${jboss.dir}/${jboss.type}"/>
+	<property name="jboss.deploy.dir" value="${server.deploy.dir}"/>
+	<property name="jboss.deploy.dir.rel" value="${jboss.deploy.dir}" relative="yes" basedir="${jboss.server.dir}"/>
 	<property name="jboss.host" value="${server.host}"/>
 	<property name="ext.jboss.dir" location="${ext.dir}/jboss/${jboss.version}" />
 	<property name="ext.jboss.zip.uri" value="http://download.jboss.org/jbossas/7.0/jboss-${jboss.version}/jboss-${jboss.version}.zip" />
 
-	<property name="infinispan.version" value="5.0.0.ALPHA4" />
-	<property name="infinispan.dir" location="${temp.dir}/infinispan${infinispan.version}" />
-	<property name="ext.infinispan.zip.uri" value="http://downloads.sourceforge.net/project/infinispan/infinispan/5.0.0.ALPHA4/infinispan-5.0.0.ALPHA4-all.zip" />
-	<property name="ext.infinispan.zip" location="${ext.jboss.dir}/infinispan-${infinispan.version}.zip" />
-	
 	<property name="ext.jboss.zip" location="${ext.jboss.dir}/jboss-${jboss.version}.zip" />
 	<property name="jboss.port.http" value="${server.port.http}"/>
 	<property name="jboss.port.ajp" value="${server.port.ajp}"/>
-	<property name="jboss.deploy.dir" value="${server.deploy.dir}"/>
 	<property name="jboss.server.log.dir" value="${server.log.dir}"/>
 	 
 	<property name="jboss.jdk.home" value="${java.home}"/>
@@ -89,25 +86,6 @@
 		</antcontrib:if>
 		</sequential>
 	</target>
-	
-	<target name="infinispan.install">
-		<mkdir dir="${ext.infinispan.dir}"/>
-		<sequential>
-		<antcontrib:if>
-			<available file="${ext.infinispan.zip}" />
-			<then/>
-			<else>
-				<get src="${ext.infinispan.zip.uri}" dest="${ext.infinispan.zip}" verbose="true" ignoreerrors="false" />
-			</else>
-		</antcontrib:if>
-		<unzip src="${ext.infinispan.zip}"						
-		       dest="${infinispan.dir}">
-			<regexpmapper from="infinispan-${infinispan.version}/(.*)$" to="\1"/>
-		</unzip>
-		</sequential>
-	</target>
-	
-
 
 	<target name="jboss.configure">
 		<!-- 
@@ -118,11 +96,24 @@
 		/jboss5.1.0.GA/server/default/conf/props/jmx-console-users.properties
 		-->
 		<property name="war.target.dir.absolute" location="${war.target.dir}" />
+		<property name="jboss.port.offset" value="0"/>
+		<property name="jboss.native-interface" value="9999"/>
+		<property name="jboss.http-interface" value="9990"/>
+		<property name="jboss.messaging-throughput" value="5455"/>
+		<property name="jboss.messaging" value="5445"/>
+		
 		<antcontrib:var name="jboss.host.exists" unset="true"/>
 		<echo message="configuring host if not there already" />
 		<xmltask source="${jboss.config.file}" dest="${jboss.config.file}">
+			<attr path="//:server/:socket-binding-group" attr="port-offset" value="${jboss.port.offset}" />
+			<attr path="//:server/:management-interfaces/:native-interface" attr="port" value="${jboss.native-interface}" />
+			<attr path="//:server/:management-interfaces/:http-interface" attr="port" value="${jboss.http-interface}" />
+			<replace path="//:server/:socket-binding-group/:socket-binding[@name='messaging-throughput']/@port" withText="${jboss.messaging-throughput}"/>
+			<replace path="//:server/:socket-binding-group/:socket-binding[@name='messaging']/@port" withText="${jboss.messaging}"/>
+			<replace path="//:server/:socket-binding-group[@name='http']/@port" withText="${jboss.port.http}"/>
 			<replace path="//:server/:socket-binding-group/:socket-binding[@name='http']/@port" withText="${jboss.port.http}"/>
 			<replace path="//:server/:socket-binding-group/:socket-binding[@name='ajp']/@port" withText="${jboss.port.ajp}"/>
+			
 			<copy path="//*[name() = 'server']/*[name()='profile']/*[name()='subsystem']/*[name()='virtual-server'][@name='${jboss.host}']/@name" attrValue="true" property="jboss.host.exists"/>
 			<insert path="//*[local-name()='connector']" position="after" unless="jboss.host.exists">
 			<![CDATA[
@@ -132,27 +123,36 @@
 			<!-- 
 			-->
 		</xmltask>
+		<echo message="configuring interface" />
+		<xmltask source="${jboss.config.file}" dest="${jboss.config.file}">
+			<replace path="//:server/:interfaces/:interface/:inet-address[@value='127.0.0.1']/@value" withText="${server.ip}"/>
+		</xmltask>
 		<echo message="adding the deploy dir if not there already" />
 		<xmltask source="${jboss.config.file}" dest="${jboss.config.file}">
 			<replace path="//*[local-name()='deployment-scanner']">
-	<![CDATA[<deployment-scanner scan-interval="5000" path="${jboss.deploy.dir}" auto-deploy-exploded="false" xmlns="urn:jboss:domain:deployment-scanner:1.0" />]]>
+	<![CDATA[<deployment-scanner scan-interval="5000" path="${jboss.deploy.dir.rel}" auto-deploy-exploded="false" xmlns="urn:jboss:domain:deployment-scanner:1.0" />]]>
 			</replace>
 		</xmltask>
 <!--
 		<echo message="add the deploy dir to VFS (bad zip deal) if not there already" />
 		<xmltask source="${jboss.server.dir}/conf/bootstrap/vfs.xml" dest="${jboss.server.dir}/conf/bootstrap/vfs.xml">
-			<copy path="//:property[@name='permanentRoots']/:map/:entry/:key[text()='file://${jboss.deploy.dir}']/text()" attrValue="true" property="jboss.vfsuri.exists"/>
+			<copy path="//:property[@name='permanentRoots']/:map/:entry/:key[text()='file://${jboss.deploy.dir.rel}']/text()" attrValue="true" property="jboss.vfsuri.exists"/>
 			<insert path="//:property[@name='permanentRoots']/:map" position="under" unless="jboss.vfsuri.exists">
 			<![CDATA[
 		        <entry xmlns="urn:jboss:bean-deployer:2.0">
-		          <key>file://${jboss.deploy.dir}</key>
+		          <key>file://${jboss.deploy.dir.rel}</key>
 		          <value><inject bean="VfsNamesExceptionHandler"/></value>
 		        </entry>
 			]]>
 			</insert>
 		</xmltask>
 		-->
-		<echo message="${jboss.deploy.dir}"/>
+		<loadfile property="jboss.standalone.sh" srcFile="${jboss.dir}/bin/standalone.sh" />
+		<antcontrib:propertyregex property="jboss.standalone.sh" input="${jboss.standalone.sh}" global="true" override="yes" 
+			regexp="(.*/standalone/log/boot.log)(\s-Djava.net.preferIPv4Stack=true\s)?(.*)" replace="\1 -Djava.net.preferIPv4Stack=true \3" />
+		<echo file="${jboss.dir}/bin/standalone.sh" message="${jboss.standalone.sh}" />
+		
+		<echo message="${jboss.deploy.dir.rel}"/>
 		<echo message="${server.deploy.dir}"/>
 		<antcontrib:if>
 			<equals arg1="${war.contextpath}" arg2="/" />
@@ -191,7 +191,7 @@
 	</target>	
 
 	<target name="deploy.jboss" depends="jboss.install">
-		<copy todir="${jboss.deploy.dir}/${war.name}" overwrite="true">
+		<copy todir="${jboss.deploy.dir.rel}/${war.name}" overwrite="true">
 			<fileset dir="${war.target.dir}"/>
 		</copy>
 	</target>	

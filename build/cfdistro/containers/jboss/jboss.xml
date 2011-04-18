@@ -23,11 +23,6 @@
 	<property name="ext.jboss.zip.uri" value="http://download.jboss.org/jbossas/7.0/jboss-${jboss.version}/jboss-${jboss.version}.zip" />
 	-->
 	<property name="ext.jboss.zip.uri" value="http://sourceforge.net/projects/jboss/files/JBoss/JBoss-${jboss.version}/jboss-${jboss.version}.zip/download" />
-
-	<property name="infinispan.version" value="5.0.0.ALPHA4" />
-	<property name="infinispan.dir" location="${temp.dir}/infinispan${infinispan.version}" />
-	<property name="ext.infinispan.zip.uri" value="http://downloads.sourceforge.net/project/infinispan/infinispan/5.0.0.ALPHA4/infinispan-5.0.0.ALPHA4-all.zip" />
-	<property name="ext.infinispan.zip" location="${ext.jboss.dir}/infinispan-${infinispan.version}.zip" />
 	
 	<property name="ext.jboss.zip" location="${ext.jboss.dir}/jboss-${jboss.version}.zip" />
 	<property name="jboss.port.http" value="${server.port.http}"/>
@@ -90,25 +85,6 @@
 		</sequential>
 	</target>
 	
-	<target name="infinispan.install">
-		<mkdir dir="${ext.infinispan.dir}"/>
-		<sequential>
-		<antcontrib:if>
-			<available file="${ext.infinispan.zip}" />
-			<then/>
-			<else>
-				<get src="${ext.infinispan.zip.uri}" dest="${ext.infinispan.zip}" verbose="true" ignoreerrors="false" />
-			</else>
-		</antcontrib:if>
-		<unzip src="${ext.infinispan.zip}"						
-		       dest="${infinispan.dir}">
-			<regexpmapper from="infinispan-${infinispan.version}/(.*)$" to="\1"/>
-		</unzip>
-		</sequential>
-	</target>
-	
-
-
 	<target name="jboss.configure">
 		<!-- 
 		<echo message="export JAVA_OPTS=-Xms256m -Xmx${server.maxmemory} -XX:MaxPermSize=128m -XX:+UseParallelGC"

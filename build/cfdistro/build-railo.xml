@@ -75,6 +75,12 @@
 			<remove path="web-app/servlet[servlet-class/text()='railo.loader.servlet.FileServlet']" />
 			<remove path="web-app/servlet-mapping[servlet-name/text()='FileServlet']" />
 		</xmltask>
+		<xmltask source="${war.target.dir}/WEB-INF/web.xml" dest="${war.target.dir}/WEB-INF/web.xml">
+			<xmlcatalog refId="commonDTDs" />
+			<replace path="web-app/servlet[servlet-class/text()='railo.loader.servlet.CFMLServlet']/init-param[param-value/text()='/WEB-INF/railo/']/param-value/text()" withText="./WEB-INF/railo/" />
+			<insert path="web-app/servlet[servlet-class/text()='railo.loader.servlet.CFMLServlet']" position="under">
+			<![CDATA[<init-param><param-name>railo-server-root</param-name><param-value>.</param-value></init-param>]]></insert>
+		</xmltask>
 		<!-- needed if deployed to jboss -->
 		<requires-ext-file file="${ext.dir}/jboss/jboss-classloading.xml"/>
 		<copy file="${ext.dir}/jboss/jboss-classloading.xml" tofile="${war.target.dir}/WEB-INF/jboss-classloading.xml" overwrite="true" />

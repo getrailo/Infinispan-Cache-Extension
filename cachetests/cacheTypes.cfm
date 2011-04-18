@@ -32,7 +32,6 @@
 	
 </cfscript>
 
-
 <cf_valueEquals left="#isStruct(variables.my.Struct)#" right="true">
 <cf_valueEquals left="#isArray(variables.my.Array)#" right="true">
 <cf_valueEquals left="#isquery(variables.my.Query)#" right="true">

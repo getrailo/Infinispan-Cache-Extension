@@ -9,14 +9,14 @@
 <body>
 
 <cfdirectory action="list" directory="#expandPath(".")#" filter="*.cfm" name="cachetests">
-	
+
 <cfloop query="cachetests">
-<cfif name NEQ "index.cfm">
+<cfif name NEQ "index.cfm" && name NEQ "mustThrow.cfm" && name NEQ "valueEquals.cfm">
 	<cfoutput>	Running #name#<cfflush interval="10"><br></cfoutput>
 	<cfinclude template="#name#">
 </cfif>
 	<cfflush>
-</cfloop>	
+</cfloop>
 
 </body>
 </html>

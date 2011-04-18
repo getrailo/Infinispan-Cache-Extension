@@ -8,7 +8,7 @@
 //		this.loginStorage="session";
 //		this.datasource = "railo";
 //		this.ormSettings = {
-//			dbcreate = 'update', logSQL = 'false', flushAtRequestEnd = 'true', saveMapping = 'false', cfclocation="/hazrating/model"
+//			dbcreate = 'update', logSQL = 'false', flushAtRequestEnd = 'true', saveMapping = 'false', cfclocation="/model"
 //		};
 	</cfscript>
 

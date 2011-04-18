@@ -2,13 +2,17 @@
 
 	<loadproperties srcfile="build.properties"/>
 	<property name="cache.type" value="Cluster" />
+	<property name="cache.props" value="maint_thread_sleep=5&amp;amp;alive_check=true&amp;amp;initial_connections=1&amp;amp;failback=true&amp;amp;max_busy_time=30&amp;amp;socket_connect_to=3&amp;amp;buffer_size=1&amp;amp;nagle_alg=true&amp;amp;max_idle_time=600&amp;amp;failover=true&amp;amp;max_spare_connections=32&amp;amp;servers=&amp;amp;socket_timeout=30&amp;amp;min_spare_connections=1" />
 <!--
-	<property name="cache.type" value="" />
 	<property name="cache.type" value="HotRod" />
+	<property name="cache.props" value="infinispan.client.hotrod.server_list=10.196.109.186:11222" />
 -->
-	<import file="${cfdistro.build.file}"/>
 
+	<import file="${cfdistro.build.file}"/>
 	<target name="build" depends="cfdistro.build,createJar">
+		<!-- custom error file with links for cfeclipse -->
+		<requires-ext resource="${ext.railo.dir}/error.cfm"/>
+		<copy file="${ext.railo.dir}/error.cfm" todir="${war.target.dir}/WEB-INF/lib/railo-server/context/library/tag" overwrite="true" />
 		<!-- add mappings -->
 		<!--
 		<mapping physical="${basedir}/../../docs" virtual="/docs"/>
@@ -18,16 +22,17 @@
 		<customtag physical="${src.dir}/cfdistro/ext/cfmltags/cfantrunner" virtual="/cfantrunner"/>
 		 -->
 		
+		<!-- add caches -->
 		<railo-cache name="infinispan" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="true" 
 			default-type="default-object"
-	    	custom="maint_thread_sleep=5&amp;amp;alive_check=true&amp;amp;initial_connections=1&amp;amp;failback=true&amp;amp;max_busy_time=30&amp;amp;socket_connect_to=3&amp;amp;buffer_size=1&amp;amp;nagle_alg=true&amp;amp;max_idle_time=600&amp;amp;failover=true&amp;amp;max_spare_connections=32&amp;amp;servers=&amp;amp;socket_timeout=30&amp;amp;min_spare_connections=1"/>
+	    	custom="${cache.props}"/>
 
 		<railo-cache name="infinispan-template" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="false" 
 			default-type="default-template"
-	    	custom="maint_thread_sleep=5&amp;amp;alive_check=true&amp;amp;initial_connections=1&amp;amp;failback=true&amp;amp;max_busy_time=30&amp;amp;socket_connect_to=3&amp;amp;buffer_size=1&amp;amp;nagle_alg=true&amp;amp;max_idle_time=600&amp;amp;failover=true&amp;amp;max_spare_connections=32&amp;amp;servers=&amp;amp;socket_timeout=30&amp;amp;min_spare_connections=1"/>
+	    	custom="${cache.props}"/>
 
 		<railo-cache name="infinispan-session" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="true" 
-	    	custom="maint_thread_sleep=5&amp;amp;alive_check=true&amp;amp;initial_connections=1&amp;amp;failback=true&amp;amp;max_busy_time=30&amp;amp;socket_connect_to=3&amp;amp;buffer_size=1&amp;amp;nagle_alg=true&amp;amp;max_idle_time=600&amp;amp;failover=true&amp;amp;max_spare_connections=32&amp;amp;servers=&amp;amp;socket_timeout=30&amp;amp;min_spare_connections=1"/>
+	    	custom="${cache.props}"/>
 	<!--
 		<railo-cache class="railo.runtime.cache.eh.EHCacheLite" default-type="default-object" 
 			custom="maxelementsondisk=10000000&amp;amp;;timeToIdleSeconds=86400&amp;amp;;maxelementsinmemory=10000&amp;amp;;overflowtodisk=true&amp;amp;;memoryevictionpolicy=LRU&amp;amp;;diskpersistent=true&amp;amp;;timeToLiveSeconds=86400"
@@ -40,16 +45,12 @@
 		<copy todir="${war.target.dir}/WEB-INF/railo/context/admin/cdriver/">
             <fileset dir="../extension/driver" includes="*cfc"/>
 		</copy>
+		<!-- tell jboss to deploy if using exploded war -->
 		<echo file="${jboss.deploy.dir}/${war.name}.war.dodeploy" message="" />
 
 	</target>	
 
-	<target name="jboss">
-		<!-- sudo ifconfig lo0 alias 10.0.0.1 -->
-		<!-- sudo ifconfig lo0 alias 10.0.0.2 -->
-		<antcontrib:var name="build.type" value="jboss"/>
-		<load-buildtype-properties buildtype="jboss" />
-		<antcontrib:runtarget target="build" />
+	<target name="no.loader">
 		<copy todir="${war.target.dir}/WEB-INF/lib/">
 		    <fileset dir="../lib" includes="*.jar"/>
 		</copy>
@@ -58,18 +59,28 @@
             <fileset dir="${war.target.dir}/WEB-INF/lib" includes="apache-xml-xalan.jar,jtds.jar,lowagie.itext.jar,serializer.jar,ss_css2.jar,w3c-dom.jar,xmlparserv2.jar"/>
             <fileset dir="${war.target.dir}/WEB-INF/lib" includes="xml-apis.jar,jtds.jar,lowagie.itext.jar,serializer.jar,ss_css2.jar,w3c-dom.jar,xmlparserv2.jar"/>
 			-->
+            <fileset dir="${war.target.dir}/WEB-INF/lib" includes="xml-apis.jar,ss_css2.jar,w3c-dom.jar,xmlparserv2.jar"/>
             <fileset dir="${war.target.dir}/WEB-INF/railo/lib" excludes="infinispan-cache.jar"/>
 		</delete>
-			
+	</target>	
+
+	<target name="jboss" depends="build">
+		<antcontrib:var name="build.type" value="jboss"/>
 <!--
-		<antcontrib:runtarget target="jar.war" />
+		<antcontrib:runtarget target="no.loader" />
 -->
+		<antcontrib:runtarget target="jar.war" />
+
 		<load-buildtype-properties buildtype="jboss1.local" />
 		<antcontrib:runtarget target="jboss.install" />
+		<copy todir="${jboss.dir}/standalone/deployments/" file="${war.target.dir}" />
 		<antcontrib:runtarget target="jboss.configure" />
+		<!--
+		-->
 
 		<load-buildtype-properties buildtype="jboss2.local" />
 		<antcontrib:runtarget target="jboss.install" />
+		<copy todir="${jboss.dir}/standalone/deployments/" file="${war.target.dir}" />
 		<antcontrib:runtarget target="jboss.configure" />
 
 <!--
