@@ -1,6 +1,8 @@
 <infinispan>
   <namedCache name="infinispan"/>
   <namedCache name="infinispan-object"/>
+  <namedCache name="infinispan-session"/>
+  <namedCache name="infinispan-client"/>
   <namedCache name="infinispan-template">
      <eviction wakeUpInterval="500" maxEntries="5000" strategy="FIFO" />
      <expiration lifespan="60000" maxIdle="1000"/>

@@ -7,14 +7,17 @@
 
 remote.ec2_1.host=ec2-50-16-96-161.compute-1.amazonaws.com
 remote.ec2_1.dir=./
+remote.ec2_2.deploy.dir=./jboss1/standalone/deployments
 remote.ec2_1.unzip.cmd=/usr/bin/unzip
 remote.ec2_1.keyfile=${user.home}/.ssh/denawskey.pem
 remote.ec2_1.keyfile.pass=
 remote.ec2_1.user=cfml
 remote.ec2_1.host.port=22
 
+
 remote.ec2_2.host=ec2-50-17-73-187.compute-1.amazonaws.com
 remote.ec2_2.dir=./
+remote.ec2_2.deploy.dir=./jboss1/standalone/deployments
 remote.ec2_2.unzip.cmd=/usr/bin/unzip
 remote.ec2_2.keyfile=${user.home}/.ssh/denawskey.pem
 remote.ec2_2.keyfile.pass=

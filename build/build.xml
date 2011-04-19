@@ -33,6 +33,9 @@
 
 		<railo-cache name="infinispan-session" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="true" 
 	    	custom="${cache.props}"/>
+
+		<railo-cache name="infinispan-client" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="true" 
+	    	custom="${cache.props}"/>
 	<!--
 		<railo-cache class="railo.runtime.cache.eh.EHCacheLite" default-type="default-object" 
 			custom="maxelementsondisk=10000000&amp;amp;;timeToIdleSeconds=86400&amp;amp;;maxelementsinmemory=10000&amp;amp;;overflowtodisk=true&amp;amp;;memoryevictionpolicy=LRU&amp;amp;;diskpersistent=true&amp;amp;;timeToLiveSeconds=86400"
