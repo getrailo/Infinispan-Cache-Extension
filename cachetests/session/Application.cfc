@@ -3,6 +3,8 @@
 	<cfscript>
 		this.name = 'railo.infinispan.session';
 		this.sessionStorage="infinispan-session";
+		this.clientStorage="infinispan-client"
+		this.sessionCluster=true;
 		//this.sessionType="j2ee";
 //		this.ormEnabled = true;
 //		this.loginStorage="session";

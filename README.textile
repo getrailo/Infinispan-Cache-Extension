@@ -48,6 +48,5 @@ _#jar the exploded war_
 _#create a distributable zip of all this stuff (be sure to delete any jboss installs first)_
 ./cfdistro.sh cfdistro.dist dist.type=src
 
-_#see something long and complicated (OS X only)
-./cfdistro.sh runwar.
-
+_#see something long and complicated (OS X only, look in ${dist.dir} for results)
+./cfdistro.sh build.war.runner
