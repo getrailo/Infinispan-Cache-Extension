@@ -1,4 +1,3 @@
-HELLO
 <cfif structKeyExists(form,"sessionvalue")>
 	<cfset session[form.sessionkey] = form.sessionvalue />
 </cfif>
@@ -6,11 +5,14 @@ HELLO
 SESSION:
 Key<input type="text" name="sessionkey"/> = <input type="text" name="sessionvalue"/><input type="submit"/>
 </form>
+<cfdump var="#session#">
 <form method="post" action="?">
 	<cfparam name="unique" default="">
+	Cache variable names will be prepended with the value in the "unique" field.<br/>
+	<br/>
 unique <input type="text" name="unique" size="10" value="<cfoutput>#unique#</cfoutput>"/>
-Test put objects <input type="submit" name="objectsput"/>
-Test get objects <input type="submit" name="objectsget"/>
+put objects  <input type="submit" name="objectsput"/>
+get objects <input type="submit" name="objectsget"/>
 </form>
 <a href="?">REFRESH</a>
 <cfscript>
@@ -49,4 +51,4 @@ if(structKeyExists(form,"objectsput") || structKeyExists(form,"objectsget")){
 
 </cfscript>
 
-<cfdump var="#session#">
+<cfdump var="#cgi.local_addr#" />
