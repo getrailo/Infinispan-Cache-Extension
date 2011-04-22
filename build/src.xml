@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <src>
 	<project>
+		<src dest="@src.dir@/coldspring" type="git" 
+		uri="git@github.com:getrailo/Infinispan-Cache-Extension.git" 
+		user="" password="" branch="origin/develop" />
 	<!-- project sources
 		<src dest="@src.dir@/../" type="svn" 
 		uri="http://subversion.assembla.com/svn/cfdistro/trunk/cfdistro" 
