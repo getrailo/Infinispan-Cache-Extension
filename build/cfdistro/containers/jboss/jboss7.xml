@@ -1,47 +1,7 @@
 <project name="jboss7" basedir="./" xmlns:antcontrib="antlib:net.sf.antcontrib">
-
-	<property name="server.deploy.dir" location="${jboss.dir}/webapps"/>
-	<property name="server.log.dir" value="${jboss.dir}/logs/"/>
-	<property name="server.host" value="localhost"/>
-	<property name="server.ip" value="127.0.0.1"/>
-	<property name="server.port" value="8080"/>
-	<property name="server.port.http" value="8080"/>
-	<property name="server.port.ajp" value="8009"/>
-	<property name="server.maxmemory" value="256M"/>
-
-	<property name="jboss.version.major" value="7.0" />
-	<property name="jboss.version" value="7.0.0.Beta3-SNAPSHOT" />
-	<property name="jboss.server" value="default" />
 	
-	<property name="jboss.dir" location="${basedir}/jboss${jboss.version}" />
-	<property name="jboss.type" value="standalone" />
-	<property name="jboss.dir.absolute" location="${jboss.dir}" />
-	<antcontrib:var name="jboss.dir" unset="true" />
-	<property name="jboss.dir" location="${jboss.dir.absolute}" />
-	<property name="jboss.server.dir" value="${jboss.dir}/${jboss.type}"/>
-	<property name="jboss.deploy.dir" value="${server.deploy.dir}"/>
-	<property name="jboss.deploy.dir.rel" value="${jboss.deploy.dir}" relative="yes" basedir="${jboss.server.dir}"/>
-	<property name="jboss.host" value="${server.host}"/>
-	<property name="ext.jboss.dir" location="${ext.dir}/jboss/${jboss.version}" />
-	<property name="ext.jboss.zip.uri" value="http://download.jboss.org/jbossas/7.0/jboss-${jboss.version}/jboss-${jboss.version}.zip" />
-
-	<property name="ext.jboss.zip" location="${ext.jboss.dir}/jboss-${jboss.version}.zip" />
-	<property name="jboss.port.http" value="${server.port.http}"/>
-	<property name="jboss.port.ajp" value="${server.port.ajp}"/>
-	<property name="jboss.server.log.dir" value="${server.log.dir}"/>
-	 
-	<property name="jboss.jdk.home" value="${java.home}"/>
-	<property name="jboss.heap.size" value="${server.maxmemory}"/>
-	<property name="jboss.perm.size" value="128M"/>
-	<property name="jboss.jnp.port" value="1099"/>
-
-	<property name="jboss.manager.url"   value="http://${jboss.host}:${server.port.http}/manager"/>
-    <property name="jboss.manager.username" value="admin"/>
-    <property name="jboss.manager.password" value="${cfadmin.password}"/>
-    <property name="cfdistro.basedir" value="${basedir}"/>
-
-	<property name="jboss.config.file" value="${jboss.dir}/standalone/configuration/standalone.xml"/>
-	
+	<dirname property="jboss7.basedir" file="${ant.file.jboss7}" />
+	<property file="${jboss7.basedir}/jboss7.properties"/>
 	
 	<antcontrib:if>
 		<equals arg1="1" arg2="1" />
@@ -53,7 +13,18 @@
 			</path>
 		</then>
 	</antcontrib:if>
-	
+
+	<macrodef name="jboss.init.props">
+	    <sequential>
+			<load-properties-if-not-defined file="${jboss7.basedir}/jboss7.properties"/>
+			<abspath path="${jboss.dir}" property="jboss.dir"/>
+			<abspath path="${jboss.server.dir}" property="jboss.server.dir"/>
+			<abspath path="${jboss.deploy.dir}" property="jboss.deploy.dir"/>
+			<abspath path="${jboss.config.file}" property="jboss.config.file"/>
+			<relpath root="${jboss.server.dir}" full-path="${jboss.deploy.dir}" property="jboss.deploy.dir.rel"/>
+	    </sequential>
+	</macrodef>
+
 	<target name="jboss.uninstall" depends="jboss.stop">
 		<delete dir="${jboss.dir}" />
 	</target>
@@ -63,6 +34,7 @@
 	</target>
 
 	<target name="jboss.install">
+		<jboss.init.props />
 		<mkdir dir="${ext.jboss.dir}"/>
 		<sequential>
 		<antcontrib:if>
@@ -84,10 +56,12 @@
 				</unzip>
 			</else>
 		</antcontrib:if>
+		<chmod dir="${jboss.dir}/bin" perm="ugo+rx" includes="**/*.sh"/>
 		</sequential>
 	</target>
 
 	<target name="jboss.configure">
+		<jboss.init.props />
 		<!-- 
 		<echo message="export JAVA_OPTS=-Xms256m -Xmx${server.maxmemory} -XX:MaxPermSize=128m -XX:+UseParallelGC"
 			file="${jboss.dir}/bin/setenv.sh"/>
@@ -103,7 +77,7 @@
 		<property name="jboss.messaging" value="5445"/>
 		
 		<antcontrib:var name="jboss.host.exists" unset="true"/>
-		<echo message="configuring host if not there already" />
+		<echo message="configuring host (${jboss.host}) if not there already, and setting ports (http: ${jboss.port.http})" />
 		<xmltask source="${jboss.config.file}" dest="${jboss.config.file}">
 			<attr path="//:server/:socket-binding-group" attr="port-offset" value="${jboss.port.offset}" />
 			<attr path="//:server/:management-interfaces/:native-interface" attr="port" value="${jboss.native-interface}" />
@@ -123,14 +97,14 @@
 			<!-- 
 			-->
 		</xmltask>
-		<echo message="configuring interface" />
+		<echo message="configuring interface (${server.ip})" />
 		<xmltask source="${jboss.config.file}" dest="${jboss.config.file}">
 			<replace path="//:server/:interfaces/:interface/:inet-address[@value='127.0.0.1']/@value" withText="${server.ip}"/>
 		</xmltask>
-		<echo message="adding the deploy dir if not there already" />
+		<echo message="adding the deploy dir if not there already: ${jboss.deploy.dir.rel}" />
 		<xmltask source="${jboss.config.file}" dest="${jboss.config.file}">
 			<replace path="//*[local-name()='deployment-scanner']">
-	<![CDATA[<deployment-scanner scan-interval="5000" path="${jboss.deploy.dir.rel}" auto-deploy-exploded="false" xmlns="urn:jboss:domain:deployment-scanner:1.0" />]]>
+	<![CDATA[<deployment-scanner scan-interval="5000" path="${jboss.deploy.dir.rel}" relative-to="jboss.server.base.dir" auto-deploy-exploded="false" xmlns="urn:jboss:domain:deployment-scanner:1.0" />]]>
 			</replace>
 		</xmltask>
 <!--
@@ -147,13 +121,10 @@
 			</insert>
 		</xmltask>
 		-->
-		<loadfile property="jboss.standalone.sh" srcFile="${jboss.dir}/bin/standalone.sh" />
-		<antcontrib:propertyregex property="jboss.standalone.sh" input="${jboss.standalone.sh}" global="true" override="yes" 
+		<loadfile property="jboss.standalone.sh.content" srcFile="${jboss.standalone.sh}" />
+		<antcontrib:propertyregex property="jboss.standalone.sh.content" input="${jboss.standalone.sh.content}" global="true" override="yes" 
 			regexp="(.*/standalone/log/boot.log)(\s-Djava.net.preferIPv4Stack=true\s)?(.*)" replace="\1 -Djava.net.preferIPv4Stack=true \3" />
-		<echo file="${jboss.dir}/bin/standalone.sh" message="${jboss.standalone.sh}" />
-		
-		<echo message="${jboss.deploy.dir.rel}"/>
-		<echo message="${server.deploy.dir}"/>
+		<echo file="${jboss.standalone.sh}" message="${jboss.standalone.sh.content}" />
 		<antcontrib:if>
 			<equals arg1="${war.contextpath}" arg2="/" />
 			<then>

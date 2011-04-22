@@ -7,6 +7,7 @@
 	<propertyset id="remote-properties">
 	  <propertyref prefix="remote.${remote}."/>
 	</propertyset>
+
 	<antcontrib:for list="${toString:remote-properties}" param="prop">
 		<sequential>
 			<antcontrib:propertyregex property="remoteprop"
@@ -23,6 +24,14 @@
 			<antcontrib:var name="${remoteprop}" value="${remotepropval}"/>
 		</sequential>
 	</antcontrib:for>
+
+	<macrodef name="verifyRemoteProperties">
+		<sequential>
+			<fail message="remote.user ${remote.user}" unless="remote.user" />
+			<fail message="remote.host ${remote.host}" unless="remote.host" />
+		</sequential>
+	</macrodef>
+	
 	
 	<target name="get.server.log.dir">
 		<antcontrib:runtarget target="${server.type}.server.log.dir" />
@@ -51,6 +60,7 @@
 
 	<target name="remote.cfdistro.dist">
 		<sequential>
+			<verifyRemoteProperties />
 			<antcontrib:runtarget target="check.creds" />
 			<antcontrib:runtarget target="cfdistro.dist" />
 			<deploy-sshexec 
@@ -74,6 +84,7 @@
 
 	<target name="remote.runtarget">
 		<sequential>
+			<verifyRemoteProperties />
 			<antcontrib:runtarget target="check.creds" />
 			<property name="target" value="build" />
 			<deploy-sshexec
@@ -83,6 +94,7 @@
 
 	<target name="remote.server.deploy">
 		<sequential>
+			<verifyRemoteProperties />
 			<antcontrib:runtarget target="check.creds" />
 			<echoproperties prefix="deploy"/>
 			<deploy-scp file="${dist.zip.file}" 
@@ -96,6 +108,7 @@
 
 	<target name="remote.cfdistro.install">
 		<sequential>
+			<verifyRemoteProperties />
 			<antcontrib:runtarget target="check.creds" />
 			<echoproperties prefix="deploy"/>
 			<deploy-scp file="${dist.zip.file}" 
@@ -173,6 +186,7 @@
 
 	<target name="remote.scp.modified" description="scp wrapped with ssh tunnel modified ${src.dir} and ${pub.dir} to ${env.remote_host} ${env.remote_dir}">
 		<echo message="Copying modified to ${remote.user}@${remote.host}:${remote.dir}${distro.name}/" />
+		<verifyRemoteProperties />
 		<deploy-scp toDir="${remote.user}@${remote.host}:${remote.dir}${distro.name}">
 			<scpfiles>
 				<fileset dir="${basedir}/../">
@@ -186,26 +200,21 @@
 		</deploy-scp>
 	</target>
 
-	<target name="remote.ssh.scp.dist.to.deploy" description="scp wrapped with ssh tunnel ${dist.dir} to ${env.remote_host} ${env.remote_dir}">
-		<path id="libpath">
-			<pathelement path="${classpath}" />
-			<pathelement path="${sshtunnel.dir}/java/sshtunnel/lib/jsch-0.1.41.jar" />
-			<fileset dir="${sshtunnel.dir}/lib">
-				<include name="**/*.jar" />
-			</fileset>
-		</path>
+	<target name="remote.scp.war" description="scp wrapped with ssh tunnel ${war.target.dir} to ${remote.deploy.dir}">
+		<echo message="Copying ${war.target.dir} to ${remote.user}@${remote.host}:${remote.deploy.dir}/" />
+		<verifyRemoteProperties />
+		<deploy-scp toDir="${remote.user}@${remote.host}:${remote.deploy.dir}"
+			file="${war.target.dir}">
+		</deploy-scp>
+	</target>
 
-		<taskdef name="sshtunnel" classname="org.mike.Ant.SSHTunnel" classpathref="libpath" />
-
-		<property file="${basedir}/sshtunnel.properties" />
-		<echo message="using keyfile: ${ssh.keyfile}" />
-		<sshtunnel host="${env.bastion_host}" username="${ssh.user.name}" keyfile="${ssh.keyfile}" passphrase="${ssh.passphrase}" trust="true" port="${env.port}" lport="${env.lport}" rport="${env.rport}" rhost="${env.remote_host}">
-			<scp sftp="true" verbose="true" failonerror="true" toDir="${ssh.user.name}@localhost:${env.remote_dir}" passphrase="${ssh.passphrase}" keyfile="${ssh.keyfile}" trust="true" port="${env.lport}">
-				<fileset dir="${dist.dir}">
-					<!-- <modified /> -->
-				</fileset>
-			</scp>
-		</sshtunnel>
+	<target name="remote.scp.dist.to.deploy" description="scp wrapped with ssh tunnel ${dist.dir} to ${env.remote_host} ${env.remote_dir}">
+		<verifyRemoteProperties />
+		<deploy-scp toDir="${remote.user}@${remote.host}:${remote.dir}${distro.name}">
+			<scpfiles>
+				<fileset dir="${dist.dir}" />
+			</scpfiles>
+		</deploy-scp>
 	</target>
 
 	<macrodef name="deploy-sshsession">

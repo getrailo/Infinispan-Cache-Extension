@@ -5,9 +5,18 @@
 #dsn.username=sa
 #dsn.password=
 
-remote.ec2_1.host=ec2-50-16-96-161.compute-1.amazonaws.com
+remote.hotrod.host=ec2-50-16-96-161.compute-1.amazonaws.com
+remote.hotrod.dir=./
+remote.hotrod.deploy.dir=./railo-infinispan/build/jboss1/standalone/deployments
+remote.hotrod.unzip.cmd=/usr/bin/unzip
+remote.hotrod.keyfile=${user.home}/.ssh/denawskey.pem
+remote.hotrod.keyfile.pass=
+remote.hotrod.user=cfml
+remote.hotrod.host.port=22
+
+remote.ec2_1.host=ec2-50-17-73-187.compute-1.amazonaws.com
 remote.ec2_1.dir=./
-remote.ec2_2.deploy.dir=./jboss1/standalone/deployments
+remote.ec2_1.deploy.dir=./railo-infinispan/build/jboss1/standalone/deployments
 remote.ec2_1.unzip.cmd=/usr/bin/unzip
 remote.ec2_1.keyfile=${user.home}/.ssh/denawskey.pem
 remote.ec2_1.keyfile.pass=
@@ -15,9 +24,9 @@ remote.ec2_1.user=cfml
 remote.ec2_1.host.port=22
 
 
-remote.ec2_2.host=ec2-50-17-73-187.compute-1.amazonaws.com
+remote.ec2_2.host=ec2-184-73-103-110.compute-1.amazonaws.com
 remote.ec2_2.dir=./
-remote.ec2_2.deploy.dir=./jboss1/standalone/deployments
+remote.ec2_2.deploy.dir=./railo-infinispan/build/jboss1/standalone/deployments
 remote.ec2_2.unzip.cmd=/usr/bin/unzip
 remote.ec2_2.keyfile=${user.home}/.ssh/denawskey.pem
 remote.ec2_2.keyfile.pass=

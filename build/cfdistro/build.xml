@@ -45,23 +45,14 @@
 	<!--
 		<taskdef name="mxunittask" classname="org.mxunit.ant.MXUnitAntTask" classpath="lib/mxunit-ant.jar" />
 	-->
+	<import file="ant-util.xml" />
 
-	<macrodef name="load-buildtype-properties">
-		<attribute name="buildtype"/>
-		<sequential>
-			<antcontrib:trycatch>
-				<try>
-					<!-- note="do it twice to catch any already defined deals" -->
-					<antcontrib:var file="${basedir}/build.@{buildtype}.properties" />
-					<antcontrib:var file="${basedir}/build.@{buildtype}.properties" />
-					<echo message="loaded custom properties: build.@{buildtype}.properties"/>
-				</try><catch><echo message="no custom properties: build.@{buildtype}.properties"/></catch>
-			</antcontrib:trycatch>
-		</sequential>
-	</macrodef>
-	<load-buildtype-properties buildtype="${build.type}" />
 	<!--
+	load the specified build properties
 	-->
+	<storeUserProperties />
+	<load-buildtype-properties buildtype="${build.type}" />
+	<restoreUserProperties />
 
 	<antcontrib:if>
 		<equals arg1="${proxy.enabled}" arg2="true" />
@@ -74,73 +65,6 @@
 			<property name="proxy.jvmarg.line" value="" />
 		</else>
 	</antcontrib:if>
-
-	<macrodef name="javac-ecj">
-		<attribute name="srcdir" />
-		<attribute name="destdir" />
-		<attribute name="classpath" default="" />
-		<attribute name="target" default="1.5" />
-		<attribute name="compliance" default="1.5" />
-		<sequential>
-			<!-- http://help.eclipse.org/galileo/index.jsp?topic=/org.eclipse.jdt.doc.isv/guide/jdt_api_compile.htm -->
-			<path id="javac-ecj.compile.classpath" path="rt.jar:@{classpath}" />
-			<echo message="Compiling @{srcdir}" />
-			<!-- we use the temp file because the cp gets too long for windows sometimes -->
-			<tempfile property="temp.file" deleteonexit="true" />
-			<concat destfile="${temp.file}">-classpath ${toString:javac-ecj.compile.classpath}</concat>
-			<java jar="${cfdistro.basedir}/lib/ecj-3.6.jar" fork="true" classpathref="build.lib.path">
-				<arg value="-@{compliance}" />
-				<arg value="-warn:none" />
-				<arg value="-d" />
-				<arg value="@{destdir}" />
-				<arg value="-target" />
-				<arg value="@{target}" />
-				<arg line="@${temp.file}" />
-				<arg value="@{srcdir}" />
-			</java>
-			<delete file="${temp.file}" />
-		</sequential>
-	</macrodef>
-
-	<macrodef name="zipdir">
-		<attribute name="destfile" />
-		<attribute name="sourcedir" />
-		<sequential>
-			<echo>Building zip: @{destfile}</echo>
-			<exec executable="zip" dir="@{sourcedir}">
-				<arg value="-qR" />
-				<arg value="@{destfile}" />
-				<arg value="*" />
-				<arg value="-x *.svn* *.git*" />
-			</exec>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="sanitizePath">
-		<attribute name="property" />
-		<attribute name="input" />
-		<sequential>
-			<antcontrib:propertyregex property="@{property}" input="@{input}" regexp="[\\|/]" replace="/" global="true" override="yes" />
-		</sequential>
-	</macrodef>
-
-	<macrodef name="sanitizeContextPath">
-		<sequential>
-			<antcontrib:propertyregex property="war.contextpath" input="${war.contextpath}" regexp="^/?([^/]+)" select="/\1/" global="false" override="yes" />
-			<antcontrib:propertyregex property="war.contextpath" input="${war.contextpath}" regexp="^/{1,}" replace="/" global="true" override="yes" />
-		</sequential>
-	</macrodef>
-
-
-	<macrodef name="fix-url-slashes">
-		<attribute name="property" />
-		<sequential>
-			<antcontrib:propertyregex property="@{property}" input="${@{property}}" regexp="/{1,}" replace="/" global="true" override="yes" />
-			<antcontrib:propertyregex property="@{property}" input="${@{property}}" regexp="http(.)?:/" replace="http\1://" global="true" override="yes" />
-			<echo>${@{property}}</echo>
-		</sequential>
-	</macrodef>
-
 
 	<macrodef name="requires-ext-file">
 		<attribute name="file" />
@@ -1141,6 +1065,9 @@
 	</fileset>
 </copy>
 <delete dir="${cfdistro.basedir}/temp-cfd-update" />
+</target>
+<target name="echoproperties" description="lists set properties">
+	<echoproperties />
 </target>
 
 <target name="cfdistro.dist" depends="clean" description="creates a minimal build">

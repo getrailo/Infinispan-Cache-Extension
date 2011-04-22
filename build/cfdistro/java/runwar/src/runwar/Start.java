@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
 
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NCSARequestLog;
@@ -26,6 +27,7 @@ import org.eclipse.jetty.util.RolloverFileOutputStream;
 public class Start {
 
 	private static Server server;
+	private static String PID;
 	public static final String[] __plusConfigurationClasses = new String[] {
 			org.eclipse.jetty.webapp.WebInfConfiguration.class.getCanonicalName(),
 			org.eclipse.jetty.webapp.WebXmlConfiguration.class.getCanonicalName(),
@@ -132,6 +134,8 @@ public class Start {
 		server.setSendServerVersion(true);
 
 		server.start();
+		System.out.println("Assigned Port: " + server.getConnectors()[0].getLocalPort() + "PID:" + PID);
+		//BrowserOpener.openURL("http://" + host + ":" + server.getConnectors()[0].getLocalPort() + contextPath + openurl.replaceFirst("^/", ""));
 		server.join();
 		if (background) {
 			System.exit(0);

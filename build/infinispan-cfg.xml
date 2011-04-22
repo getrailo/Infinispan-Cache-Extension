@@ -1,6 +1,5 @@
 <infinispan>
   <namedCache name="infinispan"/>
-  <namedCache name="infinispan-object"/>
   <namedCache name="infinispan-session"/>
   <namedCache name="infinispan-client"/>
   <namedCache name="infinispan-template">
