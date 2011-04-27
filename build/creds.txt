@@ -2,10 +2,12 @@
 #do not commit this file.  ignore if possible! 
 #gmail.user=someuser
 #gmail.password=fournick8
-#dsn.username=sa
-#dsn.password=
+dsn.mangoblog.username=mangoblog
+dsn.mangoblog.password=m4ng0blog
+dsn.mangoblog.database=mangoblog
 
 remote.hotrod.host=ec2-50-16-96-161.compute-1.amazonaws.com
+#10.196.109.186
 remote.hotrod.dir=./
 remote.hotrod.deploy.dir=./railo-infinispan/build/jboss1/standalone/deployments
 remote.hotrod.unzip.cmd=/usr/bin/unzip
@@ -15,6 +17,7 @@ remote.hotrod.user=cfml
 remote.hotrod.host.port=22
 
 remote.ec2_1.host=ec2-50-17-73-187.compute-1.amazonaws.com
+#10.202.206.58
 remote.ec2_1.dir=./
 remote.ec2_1.deploy.dir=./railo-infinispan/build/jboss1/standalone/deployments
 remote.ec2_1.unzip.cmd=/usr/bin/unzip

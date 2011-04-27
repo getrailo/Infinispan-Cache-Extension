@@ -1,15 +1,6 @@
 <project name="distro.build" default="build" basedir="./" xmlns:antcontrib="antlib:net.sf.antcontrib">
 
 	<loadproperties srcfile="build.properties"/>
-<!--
-	<property name="cache.type" value="Cluster" />
-	<property name="cache.props" value="maint_thread_sleep=5&amp;amp;alive_check=true&amp;amp;initial_connections=1&amp;amp;failback=true&amp;amp;max_busy_time=30&amp;amp;socket_connect_to=3&amp;amp;buffer_size=1&amp;amp;nagle_alg=true&amp;amp;max_idle_time=600&amp;amp;failover=true&amp;amp;max_spare_connections=32&amp;amp;servers=&amp;amp;socket_timeout=30&amp;amp;min_spare_connections=1" />
--->
-	<property name="cache.type" value="HotRod" />
-	<property name="cache.props" value="infinispan.client.hotrod.server_list=127.0.0.1:11222" />
-	<!--
-	<property name="cache.props" value="infinispan.client.hotrod.server_list=10.196.109.186:11222" />
-	-->
 
 	<import file="${cfdistro.build.file}"/>
 	<target name="build" depends="cfdistro.build,createJar">
@@ -53,8 +44,6 @@
 		<copy todir="${war.target.dir}/WEB-INF/railo/context/admin/cdriver/">
             <fileset dir="../extension/driver" includes="*cfc"/>
 		</copy>
-		<!-- tell jboss to deploy if using exploded war -->
-		<echo file="${jboss.deploy.dir}/${war.name}.war.dodeploy" message="" />
 
 	</target>	
 
@@ -84,23 +73,91 @@
 		<antcontrib:runtarget target="jboss.configure" />
 	</target>	
 
-	<target name="jboss" depends="build">
+	<target name="fig">
+		<jboss-domain-interface name="internal">
+			<inet-address value="10.202.206.58" />
+		</jboss-domain-interface>
+		<jboss-host-interface name="internal">
+			<inet-address value="10.202.206.58" />
+		</jboss-host-interface>
+		<jboss-host-domain-controller>
+	        <remote host="192.168.200.12" port="9999"/>
+		</jboss-host-domain-controller>
+		<jboss-standalone-interface name="default">
+           <any><subnet-match value="10.202.0.0/16"/></any>
+		</jboss-standalone-interface>
+	</target>
+	
+	<target name="jboss.ec2" depends="build">
+		<replace file="${war.target.dir}/META-INF/jboss-deployment-structure.xml">
+		  <replacetoken><![CDATA[railo-infinispan.war]]></replacetoken>
+		  <replacevalue><![CDATA[ROOT.war]]></replacevalue>
+		</replace>
+		<antcontrib:runtarget target="jar.war" />
+		<removePropsByRegex regex="jboss\..*"/>
+		<load-buildtype-properties buildtype="jboss.ec2" />
+		<echoproperties prefix="jboss."/>
+		<antcontrib:runtarget target="jboss.install" />
+		<copy tofile="${jboss.dir}/standalone/deployments/ROOT.war" file="${war.target.dir}" />
+		<antcontrib:runtarget target="jboss.configure" />
+		<jboss-standalone-interface name="default">
+           <any><subnet-match value="10.202.0.0/16"/></any>
+		</jboss-standalone-interface>
+	</target>
+
+	<target name="jboss.local" depends="build">
+<!--
+for testing on os x 
+sudo ifconfig lo0 alias 10.202.206.58
+sudo ifconfig lo0 alias 10.196.110.42
+-->
 <!--
 		<antcontrib:runtarget target="no.loader" />
 -->
+
+		<replace file="${war.target.dir}/META-INF/jboss-deployment-structure.xml">
+		  <replacetoken><![CDATA[railo-infinispan.war]]></replacetoken>
+		  <replacevalue><![CDATA[ROOT.war]]></replacevalue>
+		</replace>
+
 		<antcontrib:runtarget target="jar.war" />
 
 		<removePropsByRegex regex="jboss\..*"/>
-		<load-buildtype-properties buildtype="jboss1.local" />
+		<load-buildtype-properties buildtype="jboss.local" />
 		<antcontrib:runtarget target="jboss.install" />
-		<copy todir="${jboss.dir}/standalone/deployments/" file="${war.target.dir}" />
+		<copy tofile="${jboss.dir}/standalone/deployments/ROOT.war" file="${war.target.dir}" />
 		<antcontrib:runtarget target="jboss.configure" />
-
+		<jboss-domain-interface name="internal">
+			<inet-address value="10.202.206.58" />
+		</jboss-domain-interface>
+		<jboss-host-interface name="internal">
+			<inet-address value="10.202.206.58" />
+		</jboss-host-interface>
+		<!-- tell jboss to deploy if using exploded war -->
+		<echo file="${jboss.deploy.dir}/${war.name}.war.dodeploy" message="" />
+		
 		<removePropsByRegex regex="jboss\..*"/>
-		<load-buildtype-properties buildtype="jboss2.local" />
+		<antcontrib:var name="jboss.dir" value="jboss2" />
+		<antcontrib:var name="jboss.port.http" value="8777" />
+		<antcontrib:var name="jboss.native-interface" value="9998" />
+		<antcontrib:var name="jboss.http-interface" value="9991" />
+		<antcontrib:var name="jboss.port.offset" value="100" />
+		<property file="build.jboss.local.properties" />
+		
 		<antcontrib:runtarget target="jboss.install" />
-		<copy todir="${jboss.dir}/standalone/deployments/" file="${war.target.dir}" />
+		<copy tofile="${jboss.dir}/standalone/deployments/ROOT.war" file="${war.target.dir}" />
 		<antcontrib:runtarget target="jboss.configure" />
+		<jboss-domain-interface name="internal">
+			<inet-address value="10.196.110.42" />
+		</jboss-domain-interface>
+		<jboss-host-domain-controller>
+	        <remote host="10.202.206.58" port="9999"/>
+		</jboss-host-domain-controller>
+		<jboss-host-interface name="internal">
+			<inet-address value="10.196.110.42" />
+		</jboss-host-interface>
+		<!-- tell jboss to deploy if using exploded war -->
+		<echo file="${jboss.deploy.dir}/${war.name}.war.dodeploy" message="" />
 
 <!--
 		<antcontrib:runtarget target="server.start" />
