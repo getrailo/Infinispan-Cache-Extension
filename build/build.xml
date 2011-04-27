@@ -27,6 +27,10 @@
 			default-type="default-template"
 	    	custom="${cache.props}"/>
 
+		<railo-cache name="infinispan-query" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="false" 
+			default-type="default-query"
+	    	custom="${cache.props}"/>
+
 		<railo-cache name="infinispan-session" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="true" 
 	    	custom="${cache.props}"/>
 
@@ -173,7 +177,7 @@ sudo ifconfig lo0 alias 10.196.110.42
 		<relpath root="${basedir}" full-path="${infinispan.dir}" property="infinispan.dir"/>
 		<relpath root="${basedir}" full-path="${basedir}/infinispan-cfg.xml" property="infinispan.config"/>
 		<echo file="${basedir}/infinispan.sh"><![CDATA[#! /bin/sh
-${infinispan.dir}/bin/startServer.sh -r hotrod -c ${infinispan.config}]]></echo>
+${infinispan.dir}/bin/startServer.sh -r hotrod -c ${infinispan.config} -l ${server.host}]]></echo>
 		<chmod file="${basedir}/infinispan.sh" perm="ugo+rx"/>
 	</target>	
 
