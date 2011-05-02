@@ -6,6 +6,9 @@ SESSION:
 Key<input type="text" name="sessionkey"/> = <input type="text" name="sessionvalue"/><input type="submit"/>
 </form>
 <cfdump var="#session#">
+<cfdump var="#application#">
+<cfdump var="#client#">
+
 <form method="post" action="?">
 	<cfparam name="unique" default="">
 	Cache variable names will be prepended with the value in the "unique" field.<br/>
@@ -14,7 +17,8 @@ unique <input type="text" name="unique" size="10" value="<cfoutput>#unique#</cfo
 put objects  <input type="submit" name="objectsput"/>
 get objects <input type="submit" name="objectsget"/>
 </form>
-<a href="?">REFRESH</a>
+<a href="?">REFRESH</a> | 
+<a href="expire.cfm">EXPIRE</a>
 <cfscript>
 	stItem = {name="elvis", location="usa"};
 	arrItem = [1,3,5,6,7,6];
@@ -49,6 +53,9 @@ if(structKeyExists(form,"objectsput") || structKeyExists(form,"objectsget")){
 	dump(my);
 }
 
+
 </cfscript>
 
+<cfdump var="#cgi.http_host#" />
 <cfdump var="#cgi.local_addr#" />
+<cfdump var="#cgi.local_host#" />

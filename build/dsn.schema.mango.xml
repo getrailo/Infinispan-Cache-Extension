@@ -1,0 +1,260 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<database xmlns="http://db.apache.org/ddlutils/schema/1.1" name="mangoblog">
+  <table name="author" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="username" primaryKey="false" required="true" type="VARCHAR" size="50" default="" autoIncrement="false" />
+    <column name="password" primaryKey="false" required="true" type="VARCHAR" size="50" default="" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="true" type="VARCHAR" size="100" default="" autoIncrement="false" />
+    <column name="email" primaryKey="false" required="true" type="VARCHAR" size="255" default="" autoIncrement="false" />
+    <column name="description" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="shortdescription" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="picture" primaryKey="false" required="true" type="VARCHAR" size="100" default="" autoIncrement="false" />
+    <column name="alias" primaryKey="false" required="true" type="VARCHAR" size="100" default="" autoIncrement="false" />
+    <column name="active" primaryKey="false" required="false" type="BIT" default="1" autoIncrement="false" />
+    <unique name="IX_author">
+      <unique-column name="username" />
+    </unique>
+    <index name="IX_author_1">
+      <index-column name="alias" />
+    </index>
+  </table>
+  <table name="author_blog" description="">
+    <column name="author_id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="blog_id" primaryKey="true" required="true" type="VARCHAR" size="50" default="" autoIncrement="false" />
+    <column name="role" primaryKey="false" required="false" type="VARCHAR" size="20" autoIncrement="false" />
+  </table>
+  <table name="blog" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="50" default="" autoIncrement="false" />
+    <column name="title" primaryKey="false" required="false" type="VARCHAR" size="150" autoIncrement="false" />
+    <column name="description" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="tagline" primaryKey="false" required="false" type="VARCHAR" size="150" autoIncrement="false" />
+    <column name="skin" primaryKey="false" required="false" type="VARCHAR" size="100" autoIncrement="false" />
+    <column name="url" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="charset" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="basepath" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="plugins" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="systemplugins" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+  </table>
+  <table name="category" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="false" type="VARCHAR" size="150" autoIncrement="false" />
+    <column name="title" primaryKey="false" required="false" type="VARCHAR" size="150" autoIncrement="false" />
+    <column name="description" primaryKey="false" required="false" type="VARCHAR" size="150" autoIncrement="false" />
+    <column name="created_on" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false" />
+    <column name="parent_category_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="blog_id" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <foreign-key foreignTable="blog" name="FK_category_blog" onUpdate="cascade" onDelete="cascade">
+      <reference local="blog_id" foreign="id" />
+    </foreign-key>
+    <index name="IX_category">
+      <index-column name="blog_id" />
+    </index>
+  </table>
+  <table name="comment" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="entry_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="content" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="creator_name" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="creator_email" primaryKey="false" required="false" type="VARCHAR" size="100" autoIncrement="false" />
+    <column name="creator_url" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="created_on" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false" />
+    <column name="approved" primaryKey="false" required="false" type="BIT" autoIncrement="false" />
+    <column name="author_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="parent_comment_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="rating" primaryKey="false" required="false" type="REAL" size="12" autoIncrement="false" />
+    <foreign-key foreignTable="author" name="FK_comment_author" onUpdate="cascade" onDelete="cascade">
+      <reference local="author_id" foreign="id" />
+    </foreign-key>
+    <foreign-key foreignTable="comment" name="FK_comment_comment" onUpdate="cascade" onDelete="cascade">
+      <reference local="parent_comment_id" foreign="id" />
+    </foreign-key>
+    <foreign-key foreignTable="entry" name="FK_comment_entry" onUpdate="cascade" onDelete="cascade">
+      <reference local="entry_id" foreign="id" />
+    </foreign-key>
+    <index name="IX_comment">
+      <index-column name="entry_id" />
+    </index>
+  </table>
+  <table name="entry" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="true" type="VARCHAR" size="200" default="" autoIncrement="false" />
+    <column name="title" primaryKey="false" required="true" type="VARCHAR" size="200" default="" autoIncrement="false" />
+    <column name="content" primaryKey="false" required="false" type="LONGVARCHAR" size="2147483647" autoIncrement="false" />
+    <column name="excerpt" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="author_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="comments_allowed" primaryKey="false" required="true" type="BIT" default="1" autoIncrement="false" />
+    <column name="trackbacks_allowed" primaryKey="false" required="false" type="BIT" autoIncrement="false" />
+    <column name="status" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="last_modified" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false" />
+    <column name="blog_id" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <foreign-key foreignTable="author" name="FK_entry_author" onUpdate="cascade" onDelete="cascade">
+      <reference local="author_id" foreign="id" />
+    </foreign-key>
+    <foreign-key foreignTable="blog" name="FK_entry_blog" onUpdate="cascade" onDelete="cascade">
+      <reference local="blog_id" foreign="id" />
+    </foreign-key>
+    <index name="IX_entry">
+      <index-column name="name" />
+    </index>
+  </table>
+  <table name="entry_custom_field" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="255" default="" autoIncrement="false" />
+    <column name="entry_id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="field_value" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <foreign-key foreignTable="entry" name="FK_entry_custom_field_entry" onUpdate="cascade" onDelete="cascade">
+      <reference local="entry_id" foreign="id" />
+    </foreign-key>
+    <index name="FK_entry_custom_field_entry">
+      <index-column name="entry_id" />
+    </index>
+  </table>
+  <table name="entry_revision" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="entry_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="false" type="VARCHAR" size="200" autoIncrement="false" />
+    <column name="title" primaryKey="false" required="false" type="VARCHAR" size="200" autoIncrement="false" />
+    <column name="content" primaryKey="false" required="false" type="LONGVARCHAR" size="2147483647" autoIncrement="false" />
+    <column name="excerpt" primaryKey="false" required="false" type="LONGVARCHAR" size="2147483647" autoIncrement="false" />
+    <column name="author_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="last_modified" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false" />
+    <column name="entry_type" primaryKey="false" required="false" type="VARCHAR" size="10" autoIncrement="false" />
+    <index name="IX_entry_revision">
+      <index-column name="entry_id" />
+    </index>
+  </table>
+  <table name="entry_subscription" description="">
+    <column name="entry_id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="email" primaryKey="true" required="true" type="VARCHAR" size="100" default="" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="type" primaryKey="true" required="true" type="VARCHAR" size="20" default="" autoIncrement="false" />
+    <column name="mode" primaryKey="false" required="true" type="VARCHAR" size="20" default="instant" autoIncrement="false" />
+    <foreign-key foreignTable="entry" name="FK_subscription_entry" onUpdate="cascade" onDelete="cascade">
+      <reference local="entry_id" foreign="id" />
+    </foreign-key>
+  </table>
+  <table name="link" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="title" primaryKey="false" required="false" type="VARCHAR" size="100" autoIncrement="false" />
+    <column name="description" primaryKey="false" required="false" type="VARCHAR" size="1000" autoIncrement="false" />
+    <column name="address" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="category_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="showOrder" primaryKey="false" required="false" type="INTEGER" size="10" default="0" autoIncrement="false" />
+  </table>
+  <table name="link_category" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="description" primaryKey="false" required="false" type="VARCHAR" size="1000" autoIncrement="false" />
+    <column name="parent_category_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="blog_id" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+  </table>
+  <table name="log" description="">
+    <column name="level" primaryKey="false" required="false" type="VARCHAR" size="20" autoIncrement="false" />
+    <column name="category" primaryKey="false" required="false" type="VARCHAR" size="30" autoIncrement="false" />
+    <column name="message" primaryKey="false" required="false" type="LONGVARCHAR" size="2147483647" autoIncrement="false" />
+    <column name="logged_on" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false" />
+    <column name="blog_id" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="owner" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+  </table>
+  <table name="media" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="entry_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="url" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="fileSize" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false" />
+    <column name="type" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="medium" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="isDefault" primaryKey="false" required="false" type="TINYINT" size="3" autoIncrement="false" />
+    <column name="duration" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false" />
+    <column name="height" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false" />
+    <column name="width" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false" />
+    <column name="lang" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="rating" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="rating_scheme" primaryKey="false" required="false" type="VARCHAR" size="10" autoIncrement="false" />
+    <column name="title" primaryKey="false" required="false" type="VARCHAR" size="100" autoIncrement="false" />
+    <column name="description" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="thumbnail" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="media_group" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="copyright" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <foreign-key foreignTable="entry" name="FK_media_entry" onUpdate="cascade" onDelete="cascade">
+      <reference local="entry_id" foreign="id" />
+    </foreign-key>
+    <index name="IX_media">
+      <index-column name="entry_id" />
+    </index>
+  </table>
+  <table name="page" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" default="0" autoIncrement="false" />
+    <column name="template" primaryKey="false" required="false" type="VARCHAR" size="100" autoIncrement="false" />
+    <column name="parent_page_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="hierarchy" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="sort_order" primaryKey="false" required="true" type="INTEGER" size="10" default="1" autoIncrement="false" />
+  </table>
+  <table name="permission" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="20" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="description" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="is_custom" primaryKey="false" required="false" type="BIT" default="1" autoIncrement="false" />
+  </table>
+  <table name="post" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" default="0" autoIncrement="false" />
+    <column name="posted_on" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false" />
+  </table>
+  <table name="post_category" description="">
+    <column name="post_id" primaryKey="true" required="true" type="CHAR" size="35" default="0" autoIncrement="false" />
+    <column name="category_id" primaryKey="true" required="true" type="CHAR" size="35" default="0" autoIncrement="false" />
+    <foreign-key foreignTable="post" name="FK_post_category_post" onUpdate="cascade" onDelete="cascade">
+      <reference local="post_id" foreign="id" />
+    </foreign-key>
+    <index name="FK_post_category_category">
+      <index-column name="category_id" />
+    </index>
+  </table>
+  <table name="role" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="20" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="description" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="preferences" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+  </table>
+  <table name="role_permission" description="">
+    <column name="role_id" primaryKey="true" required="true" type="VARCHAR" size="20" autoIncrement="false" />
+    <column name="permission_id" primaryKey="true" required="true" type="VARCHAR" size="20" autoIncrement="false" />
+    <foreign-key foreignTable="role" name="FK_role_permission_role" onUpdate="cascade" onDelete="cascade">
+      <reference local="role_id" foreign="id" />
+    </foreign-key>
+    <foreign-key foreignTable="permission" name="FK_role_permission_permission" onUpdate="cascade" onDelete="cascade">
+      <reference local="permission_id" foreign="id" />
+    </foreign-key>
+    <unique name="PRIMARY">
+      <unique-column name="permission_id" />
+      <unique-column name="role_id" />
+    </unique>
+    <index name="FK_role_permission_role">
+      <index-column name="role_id" />
+    </index>
+  </table>
+  <table name="setting" description="">
+    <column name="path" primaryKey="false" required="true" type="VARCHAR" size="255" default="" autoIncrement="false" />
+    <column name="name" primaryKey="false" required="true" type="VARCHAR" size="100" default="" autoIncrement="false" />
+    <column name="value" primaryKey="false" required="false" type="LONGVARCHAR" size="2147483647" autoIncrement="false" />
+    <column name="blog_id" primaryKey="false" required="false" type="VARCHAR" size="50" default="" autoIncrement="false" />
+    <index name="IX_setting_path">
+      <index-column name="path" />
+    </index>
+    <index name="IX_setting_blog">
+      <index-column name="blog_id" />
+    </index>
+  </table>
+  <table name="trackback" description="">
+    <column name="id" primaryKey="true" required="true" type="VARCHAR" size="35" default="" autoIncrement="false" />
+    <column name="entry_id" primaryKey="false" required="false" type="VARCHAR" size="35" autoIncrement="false" />
+    <column name="content" primaryKey="false" required="false" type="LONGVARCHAR" size="65535" autoIncrement="false" />
+    <column name="title" primaryKey="false" required="false" type="VARCHAR" size="200" autoIncrement="false" />
+    <column name="creator_url" primaryKey="false" required="false" type="VARCHAR" size="255" autoIncrement="false" />
+    <column name="creator_url_title" primaryKey="false" required="false" type="VARCHAR" size="50" autoIncrement="false" />
+    <column name="created_on" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false" />
+    <column name="approved" primaryKey="false" required="false" type="BIT" autoIncrement="false" />
+    <foreign-key foreignTable="entry" name="FK_trackback_entry" onUpdate="cascade" onDelete="cascade">
+      <reference local="entry_id" foreign="id" />
+    </foreign-key>
+  </table>
+</database>

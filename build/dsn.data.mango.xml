@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<data>
+  <author id="9BDBFFDA-3576-4C3B-A7D6D42E6BE05BE7" username="railo" password="8AA786304C6DF4871D960B40AAB23D3B442D6EE2" name="railo" email="railo@getrailo.com" description="" shortdescription="" picture="" alias="railo" active="1" />
+  <author_blog author_id="9BDBFFDA-3576-4C3B-A7D6D42E6BE05BE7" blog_id="default" role="administrator" />
+  <blog id="default" title="My Railo Mango Blog" description="A mango blog (edit your blog description in the administration)" tagline="A Mango for you" skin="andreas07" url="http://localhost:8777/mango/" charset="utf-8" basepath="/mango/" plugins="cfformprotect,formRememberer,colorcoding,linkify,paragraphFormatter" systemplugins="SubscriptionHandler,Links,Statistics,PodManager,RevisionManager,AssetManager,PluginHelper" />
+  <link id="5D3F48CD-573F-4645-83C98E628A4DD190" title="AsFusion" description="A blog about ColdFusion and Flex" address="http://www.asfusion.com" category_id="0CD87AF4-1E5A-4415-9060885A04648217" showOrder="0" />
+  <link_category id="0CD87AF4-1E5A-4415-9060885A04648217" name="Favorite Links" blog_id="default" />
+  <log level="error" category="plugin" message="Error while instantiating plugin AssetManager: " logged_on="2011-04-25 23:34:21.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin cfformprotect: " logged_on="2011-04-25 23:34:21.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin formRememberer: " logged_on="2011-04-25 23:34:21.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin colorcoding: " logged_on="2011-04-25 23:34:21.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin linkify: " logged_on="2011-04-25 23:34:21.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin paragraphFormatter: " logged_on="2011-04-25 23:34:21.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin cfformprotect: " logged_on="2011-04-25 23:35:22.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin formRememberer: " logged_on="2011-04-25 23:35:22.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin colorcoding: " logged_on="2011-04-25 23:35:22.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin linkify: " logged_on="2011-04-25 23:35:22.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin paragraphFormatter: " logged_on="2011-04-25 23:35:22.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin cfformprotect: " logged_on="2011-04-25 23:41:25.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin formRememberer: " logged_on="2011-04-25 23:41:25.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin colorcoding: " logged_on="2011-04-25 23:41:25.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin linkify: " logged_on="2011-04-25 23:41:25.0" blog_id="default" owner="PluginLoader" />
+  <log level="error" category="plugin" message="Error while instantiating plugin paragraphFormatter: " logged_on="2011-04-25 23:41:25.0" blog_id="default" owner="PluginLoader" />
+  <page id="E70FA932-3C35-4DD2-AE12C76A5A097256" template="archives_index.cfm" parent_page_id="" hierarchy="" sort_order="1" />
+  <permission id="access_admin" name="Access site admin" description="If not enabled, user will have no access to the admin pages" is_custom="0" />
+  <permission id="manage_all_pages" name="Manage pages" description="Add, edit and remove any page" is_custom="0" />
+  <permission id="manage_all_posts" name="Manage all posts" description="Edit and remove other author's posts" is_custom="0" />
+  <permission id="manage_categories" name="Manage categories" description="Add, edit and delete categories" is_custom="0" />
+  <permission id="manage_comments" name="Manage comments" description="Edit and delete comments" is_custom="0" />
+  <permission id="manage_files" name="Manage files" description="Upload, rename and delete files" is_custom="0" />
+  <permission id="manage_links" name="Manage links" description="Add, edit and remove links" is_custom="0" />
+  <permission id="manage_pages" name="Manage own pages" description="Add, edit, and remove pages created by the user" is_custom="0" />
+  <permission id="manage_plugins" name="Manage plugins" description="Install and remove plugins" is_custom="0" />
+  <permission id="manage_plugin_prefs" name="Manage plugin custom settings" description="Change settings specified by plugins" is_custom="0" />
+  <permission id="manage_pods" name="Manage pods" description="Add, remove and re-order pods added to the blog's sidebars" is_custom="0" />
+  <permission id="manage_posts" name="Manage own posts" description="Create and edit own posts" is_custom="0" />
+  <permission id="manage_settings" name="Manage blog settings" description="Change blog main settings" is_custom="0" />
+  <permission id="manage_system" name="Manage system" description="Update blog and change system settings" is_custom="0" />
+  <permission id="manage_themes" name="Manage themes" description="Download and remove themes" is_custom="0" />
+  <permission id="manage_users" name="Manage users" description="Add and edit users and permissions" is_custom="0" />
+  <permission id="publish_pages" name="Publish pages" description="If not enabled, user can only create drafts or &quot;to review&quot; pages" is_custom="0" />
+  <permission id="publish_posts" name="Publish posts" description="If not enabled, user can only create drafts or &quot;to review&quot; posts" is_custom="0" />
+  <permission id="set_plugins" name="Manage installed plugins" description="Activate and de-activate plugins" is_custom="0" />
+  <permission id="set_profile" name="Update own profile" description="Update own username, password, description and picture" is_custom="0" />
+  <permission id="set_themes" name="Switch themes" description="Change the blog theme" is_custom="0" />
+  <post id="6C9B7E8E-ACF2-485A-BCE9FC56D5C003A6" posted_on="2011-04-25 23:34:21.0" />
+  <role id="administrator" name="Administrator" description="Somebody who has access to all the administration features." preferences="" />
+  <role id="author" name="Author" description="Somebody who can publish and manage their own posts and pages." preferences="" />
+  <role id="editor" name="Editor" description="Somebody who can publish posts, manage posts as well as manage other people's posts." preferences="" />
+  <setting path="system/assets" name="directory" value="{baseDirectory}assets/content/" />
+  <setting path="system/assets" name="path" value="assets/content/" />
+  <setting path="system/mail" name="server" value="" />
+  <setting path="system/mail" name="username" value="" />
+  <setting path="system/mail" name="password" value="" />
+  <setting path="system/urls" name="searchUrl" value="archives.cfm/search/" />
+  <setting path="system/urls" name="postUrl" value="post.cfm/{postName}" />
+  <setting path="system/urls" name="authorUrl" value="author.cfm/{authorAlias}" />
+  <setting path="system/urls" name="archivesUrl" value="archives.cfm/" />
+  <setting path="system/urls" name="categoryUrl" value="archives.cfm/category/{categoryName}" />
+  <setting path="system/urls" name="pageUrl" value="page.cfm/{pageHierarchyNames}{pageName}" />
+  <setting path="system/urls" name="rssUrl" value="feeds/rss.cfm" />
+  <setting path="system/urls" name="atomUrl" value="feeds/atom.cfm" />
+  <setting path="system/urls" name="apiUrl" value="api" />
+  <setting path="system/urls" name="useFriendlyUrls" value="1" />
+  <setting path="system/urls" name="admin" value="" />
+  <setting path="system/engine/logging" name="level" value="warning" />
+  <setting path="system/engine" name="enableThreads" value="1" />
+  <setting path="system/skins" name="directory" value="{baseDirectory}skins/" />
+  <setting path="system/skins" name="path" value="" />
+  <setting path="system/skins" name="url" value="" />
+  <setting path="system/authorization" name="methods" value="native" />
+  <setting path="system/search" name="component" value="search.DatabaseSimple" />
+  <setting path="system/plugins" name="directory" value="{componentsDirectory}plugins/" />
+  <setting path="system/plugins" name="path" value="plugins." />
+  <setting path="system/mail" name="defaultFromAddress" value="railo@getrailo.com" />
+  <setting path="system/search/settings/dataSource" name="name" value="mangoblog" />
+  <setting path="system/search/settings/dataSource" name="type" value="mysql" />
+  <setting path="system/search/settings/dataSource" name="username" value="" />
+  <setting path="system/search/settings/dataSource" name="password" value="" />
+  <setting path="system/search/settings/dataSource" name="tablePrefix" value="" />
+  <setting path="default/org/mangoblog/plugins/SubscriptionHandler" name="digest" value="1" blog_id="default" />
+  <category id="EE75231A-68F6-42A8-AC53EB131FE926F3" name="default" title="Default" description="" created_on="2011-04-25 23:34:21.0" blog_id="default" />
+  <entry id="6C9B7E8E-ACF2-485A-BCE9FC56D5C003A6" name="hello-world" title="Hello World!" content="&lt;p>Hello! and welcome to my blog. This is my first post just to see how things are working&lt;/p>" excerpt="" author_id="9BDBFFDA-3576-4C3B-A7D6D42E6BE05BE7" comments_allowed="1" status="published" last_modified="2011-04-25 23:34:21.0" blog_id="default" />
+  <entry id="E70FA932-3C35-4DD2-AE12C76A5A097256" name="archives" title="Archives" content="&lt;p>This is a sample page, which you can edit/delete from your administration.&lt;/p>&lt;p>If your theme has the custom template for archives, you will see a list of your post archives below.&lt;/p>" excerpt="" author_id="9BDBFFDA-3576-4C3B-A7D6D42E6BE05BE7" comments_allowed="0" status="published" last_modified="2011-04-25 23:34:21.0" blog_id="default" />
+  <role_permission role_id="administrator" permission_id="access_admin" />
+  <role_permission role_id="administrator" permission_id="manage_all_pages" />
+  <role_permission role_id="administrator" permission_id="manage_all_posts" />
+  <role_permission role_id="administrator" permission_id="manage_categories" />
+  <role_permission role_id="administrator" permission_id="manage_comments" />
+  <role_permission role_id="administrator" permission_id="manage_files" />
+  <role_permission role_id="administrator" permission_id="manage_links" />
+  <role_permission role_id="administrator" permission_id="manage_pages" />
+  <role_permission role_id="administrator" permission_id="manage_plugins" />
+  <role_permission role_id="administrator" permission_id="manage_plugin_prefs" />
+  <role_permission role_id="administrator" permission_id="manage_pods" />
+  <role_permission role_id="administrator" permission_id="manage_posts" />
+  <role_permission role_id="administrator" permission_id="manage_settings" />
+  <role_permission role_id="administrator" permission_id="manage_system" />
+  <role_permission role_id="administrator" permission_id="manage_themes" />
+  <role_permission role_id="administrator" permission_id="manage_users" />
+  <role_permission role_id="administrator" permission_id="publish_pages" />
+  <role_permission role_id="administrator" permission_id="publish_posts" />
+  <role_permission role_id="administrator" permission_id="set_plugins" />
+  <role_permission role_id="administrator" permission_id="set_profile" />
+  <role_permission role_id="administrator" permission_id="set_themes" />
+  <role_permission role_id="author" permission_id="access_admin" />
+  <role_permission role_id="author" permission_id="manage_all_pages" />
+  <role_permission role_id="author" permission_id="manage_categories" />
+  <role_permission role_id="author" permission_id="manage_comments" />
+  <role_permission role_id="author" permission_id="manage_files" />
+  <role_permission role_id="author" permission_id="manage_pages" />
+  <role_permission role_id="author" permission_id="manage_posts" />
+  <role_permission role_id="author" permission_id="publish_pages" />
+  <role_permission role_id="author" permission_id="publish_posts" />
+  <role_permission role_id="author" permission_id="set_profile" />
+  <role_permission role_id="editor" permission_id="access_admin" />
+  <role_permission role_id="editor" permission_id="manage_all_pages" />
+  <role_permission role_id="editor" permission_id="manage_all_posts" />
+  <role_permission role_id="editor" permission_id="manage_categories" />
+  <role_permission role_id="editor" permission_id="manage_comments" />
+  <role_permission role_id="editor" permission_id="manage_files" />
+  <role_permission role_id="editor" permission_id="manage_links" />
+  <role_permission role_id="editor" permission_id="manage_pages" />
+  <role_permission role_id="editor" permission_id="manage_plugin_prefs" />
+  <role_permission role_id="editor" permission_id="manage_posts" />
+  <role_permission role_id="editor" permission_id="publish_pages" />
+  <role_permission role_id="editor" permission_id="publish_posts" />
+  <role_permission role_id="editor" permission_id="set_profile" />
+  <role_permission role_id="editor" permission_id="set_themes" />
+  <comment id="A449C406-00DB-4DA2-9877A6C4750806A0" entry_id="6C9B7E8E-ACF2-485A-BCE9FC56D5C003A6" content="Looking forward to your blog :)&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;(This is a test comment)" creator_name="Mango Blog" creator_email="info@mangoblog.org" creator_url="http://www.mangoblog.org" created_on="2011-04-25 23:34:21.0" approved="1" rating="0.0" />
+</data>

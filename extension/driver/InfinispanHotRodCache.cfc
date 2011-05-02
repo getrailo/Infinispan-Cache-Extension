@@ -14,7 +14,7 @@
 		,field("infinispan.client.hotrod.default_executor_factory.queue_size","infinispan.client.hotrod.default_executor_factory.queue_size","100000",false,"default = 100000. If the default executor is used, this configures the queue size to initialize the executor with.","text")
 		,field("infinispan.client.hotrod.hash_function_impl.1","infinispan.client.hotrod.hash_function_impl.1","org.infinispan.client.hotrod.impl.consistenthash.ConsistentHashV1",false,"default = org.infinispan.client.hotrod.impl.consistenthash.ConsistentHashV1. This specifies the version of the hash function and consistent hash algorithm in use, and is closely tied with the HotRod server version used.","text")
 		,field("infinispan.client.hotrod.key_size_estimate","infinispan.client.hotrod.key_size_estimate","64",false,"default = 64. This hint allows sizing of byte buffers when serializing and deserializing keys, to minimize array resizing.","text")
-		,field("infinispan.client.hotrod.value_size_estimate","infinispan.client.hotrod.key_size_estimate","64",false," default = 512. This hint allows sizing of byte buffers when serializing and deserializing values, to minimize array resizing.","text")
+		,field("infinispan.client.hotrod.value_size_estimate","infinispan.client.hotrod.value_size_estimate","64",false," default = 512. This hint allows sizing of byte buffers when serializing and deserializing values, to minimize array resizing.","text")
 
 	)>
 
