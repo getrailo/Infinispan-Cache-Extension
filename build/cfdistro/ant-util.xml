@@ -7,6 +7,7 @@
 			<!-- Grab data past @{root} in @{full-path}. -->
 			<antcontrib:var name="@{property}" unset="true" />
 			<property name="@{property}" location="@{path}" />
+			<antcontrib:var name="@{property}" value="${@{property}}" />
 		</sequential>
 	</macrodef>
 
@@ -140,7 +141,7 @@
 	<macrodef name="load-properties-if-not-defined">
 		<attribute name="file" />
 		<sequential>
-			<storeUserProperties silent="true" />
+			<storeUserProperties silent="true"/>
 			<antcontrib:var file="@{file}" />
 			<restoreUserProperties silent="true" />
 		</sequential>
@@ -222,5 +223,78 @@
 		</sequential>
 	</macrodef>
 
+	<macrodef name="xml-to-property">
+		<attribute name="property" default="false" />
+		<element name="xml" implicit="true" />
+		<sequential>
+			<antcontrib:var unset="true" name="@{property}" />
+			<tempfile property="__xml_file.temp" />
+			<echoxml file="${__xml_file.temp}"><xml/></echoxml>
+			<replace file="${__xml_file.temp}">
+			  <replacetoken><![CDATA[<?xml version="1.0" encoding="UTF-8"?>]]></replacetoken>
+			  <replacevalue></replacevalue>
+			</replace>		
+			<loadfile  srcFile="${__xml_file.temp}" property="@{property}" />
+		</sequential>
+	</macrodef>
 
+	<macrodef name="checksum-zip">
+		<attribute name="srcDir" />
+		<attribute name="zipfile" default="${basedir}/checksum.zip" />
+		<sequential>
+			<mkdir dir="${temp.dir}/checksums" />
+			<checksum todir="${temp.dir}/checksums">
+				<fileset dir="." />
+			</checksum>
+			<zip destfile="${dist.dir}/checksums.zip" basedir="${temp.dir}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="hash">
+		<attribute name="value"/>
+		<attribute name="property"/>
+		<sequential>
+			<antcontrib:var name="___hashvalue" value="@{value}" />
+			<antcontrib:var name="___hashvalueproperty" value="@{property}" />
+			<script language="javascript">
+	     	<![CDATA[
+			importClass(Packages.net.sf.antcontrib.property.Variable);
+			var value = project.getProperty("___hashvalue");
+			var valueproperty = project.getProperty("___hashvalueproperty");
+			varvar = new Variable();
+			varvar.project = project;
+			varvar.setName(valueproperty);
+			varvar.setValue(value.hashCode());
+			varvar.execute();			
+		     ]]>
+			</script>
+			<antcontrib:var name="___hashvalue" unset="true" />
+			<antcontrib:var name="___hashvalueproperty" unset="true" />
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="safestring">
+		<attribute name="value"/>
+		<attribute name="property"/>
+		<sequential>
+			<antcontrib:var name="___hashvalue" value="@{value}" />
+			<antcontrib:var name="___hashvalueproperty" value="@{property}" />
+			<script language="javascript">
+	     	<![CDATA[
+			importClass(Packages.net.sf.antcontrib.property.Variable);
+			var value = project.getProperty("___hashvalue");
+			var valueproperty = project.getProperty("___hashvalueproperty");
+			varvar = new Variable();
+			varvar.project = project;
+			varvar.setName(valueproperty);
+			varvar.setValue(value.replaceAll("[^A-z0-9]","_"));
+			varvar.execute();			
+		     ]]>
+			</script>
+			<antcontrib:var name="___hashvalue" unset="true" />
+			<antcontrib:var name="___hashvalueproperty" unset="true" />
+		</sequential>
+	</macrodef>
+	
 </project>

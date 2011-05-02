@@ -5,6 +5,7 @@
 dsn.mangoblog.username=mangoblog
 dsn.mangoblog.password=m4ng0blog
 dsn.mangoblog.database=mangoblog
+#dsn.mangoblog.host=10.196.109.186
 
 remote.hotrod.host=ec2-50-16-96-161.compute-1.amazonaws.com
 #10.196.109.186

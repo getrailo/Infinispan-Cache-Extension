@@ -2,5 +2,9 @@
 
 <mappings>
   <mapping physical="@src.dir@/" virtual="/"></mapping>
+<!-- 
+  <mapping physical="@src.dir@/../cfml/mango/" virtual="/mango"></mapping>
+  <mapping physical="@src.dir@/../cfml/mura" virtual="/mura"></mapping>
+ -->
 </mappings>
 

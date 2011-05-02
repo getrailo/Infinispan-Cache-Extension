@@ -45,6 +45,22 @@
 		</sequential>
 	</target>
 
+	<target name="remote.scp">
+		<sequential>
+			<fail unless="scp.dir" message="specify ${scp.dir} dir (relative to project root) to copy to remote" />
+			<deploy-scp toDir="${remote.user}@${remote.host}:${remote.dir}${distro.name}">
+				<scpfiles>
+					<fileset dir="${basedir}/../${scp.dir}">
+						<exclude name="**/cache.properties"/>
+						<exclude name="**/temp/**"/>
+						<exclude name="**/cfdistro/ext/**"/>
+						<exclude name="**/.git/**"/>
+					</fileset>
+				</scpfiles>
+			</deploy-scp>
+		</sequential>
+	</target>
+
 	<target name="remote.scp.test">
 		<sequential>
 			<deploy-scp file="${basedir}/buildinfo.properties" todir="${remote.user}@${remote.host}:." />
@@ -191,6 +207,23 @@
 			<scpfiles>
 				<fileset dir="${basedir}/../">
 					<modified />
+					<exclude name="**/cache.properties"/>
+					<exclude name="**/temp/**"/>
+					<exclude name="**/.git/**"/>
+					<exclude name="**/dist/**"/>
+				</fileset>
+			</scpfiles>
+		</deploy-scp>
+	</target>
+
+	<target name="remote.scp.build" description="scp wrapped with ssh tunnel modified ${src.dir} and ${pub.dir} to ${env.remote_host} ${env.remote_dir}">
+		<echo message="Copying build dir to ${remote.user}@${remote.host}:${remote.dir}${distro.name}/" />
+		<verifyRemoteProperties />
+		<deploy-scp toDir="${remote.user}@${remote.host}:${remote.dir}${distro.name}">
+			<scpfiles>
+				<fileset dir="${basedir}">
+					<exclude name="**/creds.txt"/>
+					<exclude name="**/cfdistro/ext/**"/>
 					<exclude name="**/cache.properties"/>
 					<exclude name="**/temp/**"/>
 					<exclude name="**/.git/**"/>

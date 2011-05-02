@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <src>
 	<project>
-		<src dest="@src.dir@/coldspring" type="git" 
+		<src dest="${basedir}/../" type="git" 
 		uri="git@github.com:getrailo/Infinispan-Cache-Extension.git" 
 		user="" password="" branch="origin/develop" />
 	<!-- project sources
 		<src dest="@src.dir@/../" type="svn" 
 		uri="http://subversion.assembla.com/svn/cfdistro/trunk/cfdistro" 
 		user="" password="" />
+		<src dest="@src.dir@/../cfml/mura" type="svn" 
+		uri="https://svn.blueriver.com/mura/trunk/www"
+		user="" password="" />
 	-->
 	</project>
 	<sources>
+		
+		<src dest="@src.dir@/../cfml/mango" type="svn" 
+		uri="http://mangoblog.googlecode.com/svn/trunk/src/coldfusion/application/"
+		user="" password="" />
+
+		<src dest="@src.dir@/../cfml/mango/skins/andreas07" type="svn" 
+		uri="http://mangoblog.googlecode.com/svn/trunk/src/coldfusion/skins/andreas07"
+		user="" password="" />
+
 <!-- mxunit 2.1
 		<src dest="@src.dir@/mxunit" type="svn" 
 		uri="http://mxunit.googlecode.com/svn/mxunit/tags/2.0.1"

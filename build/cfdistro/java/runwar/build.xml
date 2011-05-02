@@ -2,62 +2,70 @@
 
 	<dirname property="runwar.basedir" file="${ant.file.runwar}" />
 
-	<antcontrib:if>
-		<equals arg1="${default.cfengine}" arg2="acf" />
-		<then>
-			<path id="runwar.lib.path">
-				<fileset dir="${cfdistro.basedir}/lib">
-					<include name="*.jar" />
-				</fileset>
-				<fileset dir="${war.target.dir}/WEB-INF/cfusion/lib">
-					<include name="*.jar" />
-				</fileset>
-			</path>
-		</then>
-		<else>
-			<path id="runwar.lib.path">
-				<fileset dir="${cfdistro.basedir}/lib">
-					<include name="*.jar" />
-				</fileset>
-				<fileset dir="${war.target.dir}/WEB-INF/lib">
-					<include name="*.jar" />
-				</fileset>
-			</path>
-		</else>
-	</antcontrib:if>
-	<property name="war.name" value="runwar" />
-	<property name="build.sysclasspath" value="last" />
-	
-	<property name="server.deploy.dir" value="${war.target.dir}/../"/>
-	<property name="server.log.dir" value="${log.dir}"/>
-	<property name="server.port" value="8088"/>
-	<property name="server.port.http" value="8088"/>
-	<property name="server.port.ajp" value="8009"/>
-	<property name="server.url" value="http://127.0.0.1:${server.port.http}${war.contextpath}/index.cfm"/>
-	<property name="server.memory.max" value="256M"/>
-	<property name="server.host.max" value="256M"/>
+	<macrodef name="runwar.initprops">
+		<sequential>
+			<dirname property="runwar.basedir" file="${ant.file.runwar}" />
+			<property name="war.name" value="runwar" />
+			<property name="build.sysclasspath" value="last" />
+			
+			<property name="server.deploy.dir" value="${war.target.dir}/../"/>
+			<property name="server.log.dir" value="${log.dir}"/>
+			<property name="server.port" value="8088"/>
+			<property name="server.port.http" value="${server.port}"/>
+			<property name="server.port.ajp" value="8009"/>
+			<property name="server.url" value="http://127.0.0.1:${server.port.http}${war.contextpath}/index.cfm"/>
+			<property name="server.memory.max" value="256M"/>
+			<property name="server.host.max" value="256M"/>
 
-	<property name="runwar.war.path" location="${war.target.dir}" />
-	<property name="runwar.war.contextpath" value="${war.contextpath}" />
-	<property name="runwar.port" value="${server.port.http}" />
-	<property name="runwar.host" value="${server.host}" />
-	<property name="runwar.maxmemory" value="${server.memory.max}" />
-	<property name="runwar.log.dir" location="${server.log.dir}" />
-	<property name="runwar.stop.socket" value="8079" />
-	<property name="runwar.cfml.dirlist" value="${src.dir}" />
-	<property name="open.url" value="${server.url}" />
-	<fix-url-slashes property="open.url" />
-	<property name="runner.temp.dir" value="${temp.dir}/runner" />
-	<property name="runner.jar" value="${runner.temp.dir}/${war.name}.jar" />
+			<property name="runwar.war.path" location="${war.target.dir}" />
+			<property name="runwar.war.contextpath" value="${war.contextpath}" />
+			<property name="runwar.port" value="${server.port.http}" />
+			<property name="runwar.host" value="${server.host}" />
+			<property name="runwar.maxmemory" value="${server.memory.max}" />
+			<property name="runwar.log.dir" location="${server.log.dir}" />
+			<property name="runwar.stop.socket" value="8079" />
+			<property name="runwar.cfml.dirlist" value="${src.dir}" />
+			<property name="open.url" value="${server.url}" />
+			<fix-url-slashes property="open.url" />
+			<property name="runner.temp.dir" value="${temp.dir}/runner" />
+			<property name="runner.jar" value="${runner.temp.dir}/${war.name}.jar" />
 
-	<property name="distro.name" value="${distro.name}" />
-	<property name="company.name" value="CFML Proponents" />
-	<property name="product.name.short" value="${distro.name}" />
-	<property name="product.name.long" value="${distro.name}" />
-	<property name="product.version" value="0.0.1.1" />
-	<property name="product.version.txt" value="0.0.1.1" />
+			<property name="distro.name" value="${distro.name}" />
+			<property name="company.name" value="CFML Proponents" />
+			<property name="product.name.short" value="${distro.name}" />
+			<property name="product.name.long" value="${distro.name}" />
+			<property name="product.version" value="0.0.1.1" />
+			<property name="product.version.txt" value="0.0.1.1" />
+			<antcontrib:if>
+				<equals arg1="${default.cfengine}" arg2="acf" />
+				<then>
+					<path id="runwar.lib.path">
+						<fileset dir="${cfdistro.basedir}/lib">
+							<include name="*.jar" />
+						</fileset>
+						<fileset dir="${war.target.dir}/WEB-INF/cfusion/lib">
+							<include name="*.jar" />
+						</fileset>
+					</path>
+				</then>
+				<else>
+					<path id="runwar.lib.path">
+						<fileset dir="${cfdistro.basedir}/lib">
+							<include name="*.jar" />
+						</fileset>
+						<fileset dir="${war.target.dir}/WEB-INF/lib">
+							<include name="*.jar" />
+						</fileset>
+					</path>
+				</else>
+			</antcontrib:if>
+
+		</sequential>
+	</macrodef>
+	<runwar.initprops />
 
 	<target name="runwar.compile">
+		<runwar.initprops />
 		<delete dir="${runwar.basedir}/bin/runwar/"/>
 		<mkdir dir="${runwar.basedir}/bin/runwar/"/>
 		<!--
@@ -70,6 +78,7 @@
 	</target>
 
 	<target name="runwar.jar" depends="runwar.compile">
+		<runwar.initprops />
 		<jar destfile="${cfdistro.basedir}/lib/runwar.jar"
          basedir="${runwar.basedir}/bin/runwar/" 
          includes="**/*.class"
@@ -101,11 +110,13 @@
 	</target>
 
 	<target name="runwar.start.fg" description="starts jetty-runner server in foreground">
+		<runwar.initprops />
 		<antcontrib:var name="runwar.background" value="false" />
 		<antcontrib:runtarget target="runwar.start" />
 	</target>
 
 	<target name="runwar.start" depends="runwar.jar" description="starts jetty-runner server">
+		<runwar.initprops />
 		<echoproperties prefix="runwar"/>
 		<property name="background" value="true" />
 		<property name="runwar.background" value="${background}" />
@@ -151,6 +162,7 @@
 	</target>
 	
 	<target name="runwar.stop" description="stops jetty-runner server">
+		<runwar.initprops />
 		<echo message="stopping jetty-runner.  peace out bro!"/>
 		<java classname="runwar.Stop" classpathref="runwar.lib.path">
 			<arg value="${runwar.stop.socket}" />
@@ -158,6 +170,7 @@
 	</target>
 
 	<target name="server.openUrl" description="launches a browser pointing at ${open.url}">
+		<runwar.initprops />
 		<open-url url="${open.url}" />			
 	</target>
 

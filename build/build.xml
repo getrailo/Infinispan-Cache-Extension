@@ -17,7 +17,24 @@
 		<!-- add custom tags example
 		<customtag physical="${src.dir}/cfdistro/ext/cfmltags/cfantrunner" virtual="/cfantrunner"/>
 		 -->
+		<antcontrib:runtarget target="add.caches" />
 		
+	<!--
+		<railo-cache class="railo.runtime.cache.eh.EHCacheLite" default-type="default-object" 
+			custom="maxelementsondisk=10000000&amp;amp;;timeToIdleSeconds=86400&amp;amp;;maxelementsinmemory=10000&amp;amp;;overflowtodisk=true&amp;amp;;memoryevictionpolicy=LRU&amp;amp;;diskpersistent=true&amp;amp;;timeToLiveSeconds=86400"
+			name="infinispan" read-only="false" storage="true"/>
+	-->
+				
+		<copy todir="${war.target.dir}/WEB-INF/railo/lib/">
+		    <fileset dir="../lib" includes="*.jar"/>
+		</copy>
+		<copy todir="${war.target.dir}/WEB-INF/railo/context/admin/cdriver/">
+            <fileset dir="../extension/driver" includes="*cfc"/>
+		</copy>
+
+	</target>	
+
+	<target name="add.caches">
 		<!-- add caches -->
 		<railo-cache name="infinispan" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="true" 
 			default-type="default-object"
@@ -36,21 +53,8 @@
 
 		<railo-cache name="infinispan-client" class="railo.extension.io.cache.infinispan.Infinispan${cache.type}Cache" storage="true" 
 	    	custom="${cache.props}"/>
-	<!--
-		<railo-cache class="railo.runtime.cache.eh.EHCacheLite" default-type="default-object" 
-			custom="maxelementsondisk=10000000&amp;amp;;timeToIdleSeconds=86400&amp;amp;;maxelementsinmemory=10000&amp;amp;;overflowtodisk=true&amp;amp;;memoryevictionpolicy=LRU&amp;amp;;diskpersistent=true&amp;amp;;timeToLiveSeconds=86400"
-			name="infinispan" read-only="false" storage="true"/>
-	-->
-				
-		<copy todir="${war.target.dir}/WEB-INF/railo/lib/">
-		    <fileset dir="../lib" includes="*.jar"/>
-		</copy>
-		<copy todir="${war.target.dir}/WEB-INF/railo/context/admin/cdriver/">
-            <fileset dir="../extension/driver" includes="*cfc"/>
-		</copy>
-
 	</target>	
-
+	
 	<target name="no.loader">
 		<copy todir="${war.target.dir}/WEB-INF/lib/">
 		    <fileset dir="../lib" includes="*.jar"/>
@@ -97,6 +101,8 @@
 		  <replacetoken><![CDATA[railo-infinispan.war]]></replacetoken>
 		  <replacevalue><![CDATA[ROOT.war]]></replacevalue>
 		</replace>
+		<antcontrib:var name="cache.props" value="infinispan.client.hotrod.server_list=10.196.109.186:11222" />
+		<antcontrib:runtarget target="add.caches" />		
 		<antcontrib:runtarget target="jar.war" />
 		<removePropsByRegex regex="jboss\..*"/>
 		<load-buildtype-properties buildtype="jboss.ec2" />
@@ -150,6 +156,7 @@ sudo ifconfig lo0 alias 10.196.110.42
 		
 		<antcontrib:runtarget target="jboss.install" />
 		<copy tofile="${jboss.dir}/standalone/deployments/ROOT.war" file="${war.target.dir}" />
+		<antcontrib:var name="jboss.dir" value="jboss2" />
 		<antcontrib:runtarget target="jboss.configure" />
 		<jboss-domain-interface name="internal">
 			<inet-address value="10.196.110.42" />
@@ -210,7 +217,22 @@ ${infinispan.dir}/bin/startServer.sh -r hotrod -c ${infinispan.config} -l ${serv
 		<jar basedir="${extension.bin.dir}" destfile="${war.target.dir}/WEB-INF/railo/lib/infinispan-cache.jar" />
 		<delete dir="${extension.bin.dir}" />
 	</target>
-	
+ 
+	<target name="data.import">
+		<property name="build.type" value="localdev" />
+		<!--
+			http://db.apache.org/ddlutils/ant/org.apache.ddlutils.task.DdlToDatabaseTask.html
+		-->
+		<dsn-import dsn="mangoblog" schemafile="dsn.schema.mango.xml"  datafile="dsn.data.mango.xml" />
+	</target>
+
+	<target name="data.export">
+		<property name="build.type" value="localdev" />
+		<!--
+			http://db.apache.org/ddlutils/ant/org.apache.ddlutils.task.DdlToDatabaseTask.html
+			-->
+		<dsn-export dsn="mangoblog" schemafile="dsn.schema.mango.xml"  datafile="dsn.data.mango.xml" />
+	</target>
 	
 	<!-- these are just here for the Eclipse Ant UI ordering -->
 	<target name="build.start.launch">

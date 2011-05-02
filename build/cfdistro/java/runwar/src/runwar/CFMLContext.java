@@ -27,6 +27,7 @@ public class CFMLContext extends WebAppContext {
 		try {
 			for(int x =0; x < cfmlDirs.length; x++){				
 				cfmlDirResource[x] = Resource.newResource(cfmlDirs[x]);
+				System.out.println("Serving content from " + cfmlDirResource[x].getFile().getAbsolutePath());
 			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block

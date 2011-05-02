@@ -2,7 +2,7 @@
 
 	<macrodef name="git">
 		<attribute name="command" />
-		<attribute name="dir" default="${basedir}/../" />
+		<attribute name="dir" default="${basedir}" />
 		<element name="args" optional="true" />
 		<sequential>
 			<antcontrib:var name="git.results" unset="true" />
@@ -19,7 +19,7 @@
 					</exec>
 				</then>
 				<else>
-					<echo message="JGit - command: @{command}" />
+					<echo message="JGit - command: @{command}" /><!-- <echoxml><elem /></echoxml> -->
 		            <java classname="org.eclipse.jgit.pgm.Main" classpathref="build.lib.path" fork="true" dir="@{dir}" outputproperty="git.results">
 						<arg value="@{command}" />
 						<args />
@@ -111,13 +111,27 @@
 	<macrodef name="git-checkout">
 		<attribute name="repository" />
 		<attribute name="branch" />
+		<attribute name="force" default="false"/>
 		<sequential>
-			<git command="branch" dir="@{repository}">
-				<args>
-					<arg value="-r" />
-					<arg value="@{branch}" />
-				</args>
-			</git>
+			<antcontrib:if>
+				<equals arg1="@{force}" arg2="true"/>
+				<then>
+					<echo message="FORCED checkout.  Any changes were overwritten!"/>
+					<git command="checkout" dir="@{repository}">
+						<args>
+							<arg value="@{branch}" />
+							<arg value="-f" />
+						</args>
+					</git>
+				</then>
+				<else>
+					<git command="checkout" dir="@{repository}">
+						<args>
+							<arg value="@{branch}" />
+						</args>
+					</git>
+				</else>
+			</antcontrib:if>
 		</sequential>
 	</macrodef>
 
@@ -134,6 +148,23 @@
 			<git command="pull" dir="@{dest}" />
 		</sequential>
 	</macrodef>
+
+	<macrodef name="git-commit-hash">
+		<attribute name="repository" />
+		<attribute name="property" />
+		<sequential>
+			<git command="log" dir="${src.dir}"><args><arg value="-n"/><arg value="1"/></args></git>
+			<antcontrib:propertyregex override="yes" property="@{property}" input="${git.results}" regexp=".*commit\s(.\w+).*" select="\1" />
+		</sequential>
+	</macrodef>
+
+	<target name="jgit.help">
+		<git command="branch">
+			<args>
+				<arg value="-h" />
+			</args>
+		</git>
+	</target>
 
 	<target name="src.import.git" depends="exists.src.xml">
 		<xmltask sourcebuffer="src.buff">
@@ -155,32 +186,37 @@
 		<property name="temp.dir.absolute" location="${temp.dir}" />
 		<antcontrib:var name="temp.dir" unset="true" />
 		<property name="temp.dir" location="${temp.dir.absolute}" />				
+		<property name="project.update.force" value="false" />				
 		<xmltask sourcebuffer="src.buff">
 			<call path="src/project/src[@type='git']">
 				<param name="dest" path="@dest" default="NONE" />
 				<param name="type" path="@type" default="NONE" />
 				<param name="uri" path="@uri" default="NONE" />
-				<param name="branch" path="@branch" default="NONE" />
+				<param name="branch" path="@branch" default="master" />
+				<param name="sshkey" path="@sshkey" default="NONE" />
 				<actions>
-					<available file="@dest/.git" type="dir" property="exists.git.dir" />
 					<antcontrib:if>
 						<or>
-							<equals arg1="${exists.git.dir}" arg2="true" />
+							<not><available file="@{dest}.git" type="dir"/></not>
 							<equals arg1="${project.overwrite}" arg2="true" />
 						</or>
 						<then>
-							<echo message="updating src: @{dest}" />
-							<git-clone-pull repository="@{uri}" dir="${basedir}" dest="${temp.dir}/git-temp" />
+							<echo message="@{dest}.git not there (or $${project.overwrite} is true), let us try to get one- this may take a [long-ass] bit..." />
+							<git-clone repository="@{uri}" dest="@{dest}" />
+							<antcontrib:if>
+								<equals arg1="@{branch}" arg2="NONE" />
+								<then/>
+								<else>
+									<git-checkout repository="@{dest}" branch="@{branch}"/>
+								</else>
+							</antcontrib:if>
 						</then>
 						<else>
-							<echo message="no .git dir, let us try to get one- this may take a bit..." />
-							<delete dir="${temp.dir}/git-temp"/>
-							<git-clone repository="@{uri}" dest="${temp.dir}/git-temp" />
-							<git-checkout repository="${temp.dir}/git-temp" branch="@{branch}"/>
-							<copy todir="@{dest}">
-								<fileset dir="${temp.dir}/git-temp" excludes="${temp.dir}/git-temp/build/**" />
-							</copy>
-							<delete dir="${temp.dir}/git-temp"/>
+							<echo message="updating src: @{dest}" />
+							<!--
+							-->
+							<git command="fetch" dir="@{dest}"/>
+							<git-checkout repository="@{dest}" branch="@{branch}" force="${project.update.force}"/>
 						</else>
 					</antcontrib:if>
 				</actions>
@@ -196,51 +232,55 @@
 				<param name="type" path="@type" default="NONE" />
 				<param name="uri" path="@uri" default="NONE" />
 				<actions>
+					<antcontrib:var name="revisions.are.same" value="true"/>
+					<antcontrib:var name="desthash" unset="true"/>
+					<safestring value="@{dest}" property="desthash"/>
+					<echo message="${desthash}"/>
+					<git-commit-hash repository="@{dest}" property="pre.fetch.commit.hash" />
+					<propertyfile file="${basedir}/scm.cache" comment="source control management cache">
+						<entry key="${desthash}.last.commit.hash" default="${pre.fetch.commit.hash}" />
+						<entry key="${desthash}.current.commit.hash" value="${pre.fetch.commit.hash}" />
+					</propertyfile>
+					<property file="${basedir}/scm.cache" />
+					<antcontrib:propertycopy name="desthash.last.commit.hash" from="${desthash}.last.commit.hash" override="true"/>
+					<antcontrib:propertycopy name="desthash.current.commit.hash" from="${desthash}.current.commit.hash" override="true"/>
+					<echo>${desthash.last.commit.hash}" arg2="${desthash.current.commit.hash}</echo>
+					<antcontrib:if>
+						<equals arg1="${desthash.last.commit.hash}" arg2="${desthash.current.commit.hash}" />
+						<then>
+							<echo message="Local revision is unchanged" />
+						</then>
+						<else>
+							<property name="revisions.local.differ" value="true" />
+							<antcontrib:var name="revisions.are.same" value="false"/>
+							<echo message="Local revision differs" />
+						</else>
+					</antcontrib:if>
+					<!-- check for remote commits (defaults to origin) -->
+					<git command="fetch" dir="@{dest}"/>
 					<git command="log" dir="@{dest}">
 						<args>
 							<arg value="-n" />
 							<arg value="1" />
+							<arg value="--" />
+							<arg value="HEAD..origin/master" />
 						</args>
 					</git>
+					<antcontrib:if>
+						<equals arg1="${git.results}" arg2="" />
+						<then>
+							<echo message="Remote revision is the same" />
+						</then>
+						<else>
+							<antcontrib:var name="revisions.are.same" value="false"/>
+							<property name="revisions.remote.differ" value="true" />
+							<echo message="Remote revision differs" />
+						</else>
+					</antcontrib:if>
 				</actions>
 			</call>
 		</xmltask>
-		<echo message="${git.results}" file="./git.current.rev.txt" />
-		<condition property="revisions.are.same">
-			<filesmatch file1="./git.current.rev.txt" file2="./git.last.rev.txt" textfile="true" />
-		</condition>
-		<antcontrib:if>
-			<equals arg1="${revisions.are.same}" arg2="true" />
-			<then>
-				<echo message="Local revision is unchanged" />
-			</then>
-			<else>
-				<property name="revisions.local.differ" value="true" />
-				<echo message="Local revision differs" />
-			</else>
-		</antcontrib:if>
-		<echo message="${git.results}" file="./git.last.rev.txt" />
-		<!-- check for remote commits (defaults to origin) -->
-		<git command="fetch"/>
-		<git command="log">
-			<args>
-				<arg value="-n" />
-				<arg value="1" />
-				<arg value="--" />
-				<arg value="HEAD..origin/master" />
-			</args>
-		</git>
-		<antcontrib:if>
-			<equals arg1="${git.results}" arg2="" />
-			<then>
-				<echo message="Remote revision is the same" />
-			</then>
-			<else>
-				<property name="revisions.remote.differ" value="true" />
-				<echo message="Remote revision differs" />
-			</else>
-		</antcontrib:if>
-
+		<echoproperties prefix="revisions"/>
 	</target>
 
 	<target name="exists.src.xml">
