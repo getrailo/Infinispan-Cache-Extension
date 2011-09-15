@@ -67,8 +67,7 @@ public class InfinispanHotRodCache implements Cache {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		manager = new RemoteCacheManager(properties);
-		manager.start();
+		manager = InfinispanHotRodManager.getInstance(properties);
 		/*
 				infinispan.client.hotrod.request_balancing_strategy, default = org.infinispan.client.hotrod.impl.transport.tcp.RoundRobinBalancingStrategy. For replicated (vs distributed) Hot Rod server clusters, the client balances requests to the servers according to this strategy.
 				infinispan.client.hotrod.server_list, default = 127.0.0.1:11311. This is the initial list of Hot Rod servers to connect to, specified in the following format: host1:port1;host2:port2... At least one host:port must be specified.

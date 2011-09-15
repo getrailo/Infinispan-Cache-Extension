@@ -65,34 +65,9 @@ public class InfinispanClusterCache implements Cache {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		GlobalConfiguration gc = GlobalConfiguration.getClusteredDefault();
-		gc.setClusterName("demoCluster");
-
-		// gc.setClusterName("demoCluster");
-		gc.setTransportClass(JGroupsTransport.class.getName());
-		// Load the jgroups properties
-		Properties p = new Properties();
-		p.setProperty("configurationFile", "jgroups-udp.xml");
-		gc.setTransportProperties(p);
-		gc.setAllowDuplicateDomains(false);
-		Configuration c = new Configuration();
-		// Distributed cache mode
-		c.setCacheMode(Configuration.CacheMode.DIST_SYNC);
-		c.setExposeJmxStatistics(true);
-		c.setUseLazyDeserialization(true);
-
-		// turn functionality which returns the previous value when setting
-		c.setUnsafeUnreliableReturnValues(true);
-
-		// data will be distributed over 3 nodes
-		c.setNumOwners(3);
-		c.setL1CacheEnabled(true);
-
-		// Allow batching
-		c.setInvocationBatchingEnabled(true);
-		c.setL1Lifespan(6000000);
-		manager = new DefaultCacheManager(gc, c, false);
+		manager = InfinispanCacheManager.getInstance(properties);
+//		Configuration c = manager.getDefaultConfiguration().clone();
+//		manager.defineConfiguration(cacheName, c);
 	}
 
 	private void setClassLoader() {
