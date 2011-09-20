@@ -3,7 +3,7 @@
 	<loadproperties srcfile="build.properties"/>
 
 	<import file="${cfdistro.build.file}"/>
-	<target name="build" depends="cfdistro.build,createJar">
+	<target name="build" depends="cfdistro.build,createExtension">
 		<!-- custom error file with links for cfeclipse -->
 		<requires-ext resource="${ext.railo.dir}/error.cfm"/>
 		<copy file="${ext.railo.dir}/error.cfm" todir="${war.target.dir}/WEB-INF/lib/railo-server/context/library/tag" overwrite="true" />
@@ -120,6 +120,7 @@
 for testing on os x 
 sudo ifconfig lo0 alias 10.202.206.58
 sudo ifconfig lo0 alias 10.196.110.42
+./jmeter.sh -n -t ../../../docs/MangoLoad.jmx -j jmeter.log -l fun.jtl
 -->
 <!--
 		<antcontrib:runtarget target="no.loader" />
@@ -188,7 +189,7 @@ ${infinispan.dir}/bin/startServer.sh -r hotrod -c ${infinispan.config} -l ${serv
 		<chmod file="${basedir}/infinispan.sh" perm="ugo+rx"/>
 	</target>	
 
-	<target name="createJar">
+	<target name="createExtension">
 		<path id="master-classpath">
 			<fileset dir="${war.target.dir}/WEB-INF/lib/">
 				<include name="*.jar"/>
@@ -208,14 +209,43 @@ ${infinispan.dir}/bin/startServer.sh -r hotrod -c ${infinispan.config} -l ${serv
 		</javac>
 -->
 		<property name="extension.bin.dir" value="${temp.dir}/bin"/>
+		<property name="extension.tmp.dir" value="${temp.dir}/ext"/>
 		<delete dir="${extension.bin.dir}" />
+		<delete dir="${extension.tmp.dir}" />
 		<mkdir dir="${extension.bin.dir}" />
+		<mkdir dir="${extension.tmp.dir}" />
+		<mkdir dir="${extension.tmp.dir}/lib" />
 		<javac-ecj srcdir="${basedir}/../extension/src" destdir="${extension.bin.dir}"
 			compliance="1.6" target="1.6"
 		    classpath="${toString:master-classpath}"/>
 
 		<jar basedir="${extension.bin.dir}" destfile="${war.target.dir}/WEB-INF/railo/lib/infinispan-cache.jar" />
-		<delete dir="${extension.bin.dir}" />
+		<copy file="${war.target.dir}/WEB-INF/railo/lib/infinispan-cache.jar" todir="${extension.tmp.dir}/lib" overwrite="true" />
+		<tstamp prefix="stamp">
+			 <format property="TODAY_UK" pattern="yyyyMMMMdhhmm" locale="en,UK"/>
+		</tstamp>
+		<tstamp prefix="created">
+			<format property="TODAY" pattern="yyyy-MMMM-d" locale="en,UK"/>
+			<format property="TSTAMP" pattern="HH:mm" locale="en,UK"/>
+		</tstamp>
+		<copy file="../extension/config.template.xml" tofile="${extension.tmp.dir}/config.xml" overwrite="true" />
+		<replace file="${extension.tmp.dir}/config.xml" token="{version}" value="${version}.${stamp.DSTAMP}${stamp.TSTAMP}" />
+		<replace file="${extension.tmp.dir}/config.xml" token="{created}" value="${created.TODAY} ${created.TSTAMP}" />
+		<copy todir="${extension.tmp.dir}/">
+	    	<fileset dir="../extension">
+				<exclude name="**/src/**"/>
+				<exclude name="**/bin/**"/>
+				<exclude name="**/config.template.xml"/>
+	    	</fileset>
+		</copy>
+		<copy todir="${extension.tmp.dir}/lib">
+	    	<fileset dir="../lib" includes="*.jar"/>
+		</copy>
+		<zip destfile="../cfml/infinispan-cache.zip" basedir="${extension.tmp.dir}">
+			<exclude name="**/src/**"/>
+			<exclude name="**/bin/**"/>
+		</zip>
+
 	</target>
  
 	<target name="data.import">

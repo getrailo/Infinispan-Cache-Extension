@@ -30,7 +30,7 @@ import railo.runtime.exp.PageException;
 import railo.runtime.type.Struct;
 import railo.runtime.util.Cast;
 
-public class InfinispanHotRodCache implements Cache {
+public class InfinispanHotRodClientCache implements Cache {
 
 	private int hits;
 	private int misses;

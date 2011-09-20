@@ -64,16 +64,6 @@ public class EmbeddedCacheInstance {
 		return instance;
 	}
 
-//	Albuquerque, NM to Boston, MA
-//	Sunday, May 1, 2011
-//	Depart Albuquerque, NM (ABQ) 		1:50 PM
-//	Arrive in Boston Logan, MA (BOS) 	11:25 PM
-//	
-//	Boston, MA to Albuquerque, NM
-//	Wednesday, May 4, 2011
-//	Depart Boston Logan, MA (BOS)		1:45 PM
-//	Arrive in Albuquerque, NM (ABQ) 	6:45 PM
-
 	public Cache<Object, Object> getCache(String cachename) {
 		ClassLoader ocl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(configCl);

@@ -1,24 +1,33 @@
 package railo.extension.io.cache.infinispan;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.xerces.parsers.DOMParser;
 import org.infinispan.config.Configuration;
 import org.infinispan.config.GlobalConfiguration;
 import org.infinispan.manager.CacheContainer;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import railo.commons.io.cache.Cache;
 import railo.commons.io.cache.CacheEntry;
 import railo.commons.io.cache.CacheEntryFilter;
 import railo.commons.io.cache.CacheKeyFilter;
 import railo.commons.io.cache.exp.CacheException;
+import railo.commons.io.res.Resource;
 import railo.extension.io.cache.CacheUtil;
 import railo.extension.io.cache.util.CacheKeyFilterAll;
 import railo.loader.engine.CFMLEngineFactory;
@@ -34,7 +43,7 @@ public class InfinispanClusterCache implements Cache {
 	private int misses;
 	private ClassLoader classLoader;
 	private String cacheName;
-	private DefaultCacheManager manager;
+	private EmbeddedCacheManager manager;
 
 	public static void init(Config config, String[] cacheNames, Struct[] arguments) throws IOException {
 	}
@@ -54,6 +63,7 @@ public class InfinispanClusterCache implements Cache {
 		this.classLoader = config.getClassLoader();
 		this.cacheName = cacheName;
 		setClassLoader();
+
 		Iterator propNames = arguments.keyIterator();
 		Properties properties = new Properties();
 		try {
@@ -65,7 +75,7 @@ public class InfinispanClusterCache implements Cache {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		manager = InfinispanCacheManager.getInstance(properties);
+		manager = InfinispanCacheManager.getInstance(config, properties);
 //		Configuration c = manager.getDefaultConfiguration().clone();
 //		manager.defineConfiguration(cacheName, c);
 	}

@@ -3,14 +3,14 @@
 	<info>
 		<id>35979260-BD0B-11DF-851A-0800200C9A66</id>
 		<version>{version}</version>
-		<name>Infinispan Cache (memcached protocol)</name>
+		<name>Infinispan Cache</name>
 		<type>all</type>
-		<label>Infinispan Cache (memcached protocol)</label>
-		<description>Infinispan Cache (memcached protocol) Extension</description>
+		<label>Infinispan Cache</label>
+		<description>Infinispan Cache Extension</description>
 		<created>{created}</created> 
-		<category>Core Extension</category>
-		<author>Andrea Campolonghi</author>
-		<image>http://preview.getrailo.org/logos/infinspan-logo.png</image>
+		<category>Core</category>
+		<author>Denny Valliant</author>
+		<image>https://docs.jboss.org/author/download/attachments/3737207/ISPN</image>
 		<mailinglist>http://groups.google.com/group/railo-beta</mailinglist>
 		<support>http://groups.google.com/group/railo-beta</support>
 		<documentation>http://wiki.getrailo.com/wiki/extensions:infinispan</documentation>

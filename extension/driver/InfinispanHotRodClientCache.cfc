@@ -1,10 +1,10 @@
 <cfcomponent extends="Cache">
 
     <cfset fields=array(
-		field("Servers","infinispan.client.hotrod.server_list","",true,"default = 127.0.0.1:11311. This is the initial list of Hot Rod servers to connect to, specified in the following format: host1:port1;host2:port2... At least one host:port must be specified.","textarea")
+		field("Servers","infinispan.client.hotrod.server_list","127.0.0.1:11222",true,"default = 127.0.0.1:11222. This is the initial list of Hot Rod servers to connect to, specified in the following format: host1:port1;host2:port2... At least one host:port must be specified.","textarea")
 
 		,field("infinispan.client.hotrod.request_balancing_strategy","infinispan.client.hotrod.request_balancing_strategy","org.infinispan.client.hotrod.impl.transport.tcp.RoundRobinBalancingStrategy",false,"default = org.infinispan.client.hotrod.impl.transport.tcp.RoundRobinBalancingStrategy. For replicated (vs distributed) Hot Rod server clusters, the client balances requests to the servers according to this strategy.","text")
-		,field("infinispan.client.hotrod.force_return_values","infinispan.client.hotrod.force_return_values",true,false,"default = false. Whether or not to implicitly Flag.FORCE_RETURN_VALUE for all calls.","checkbox","true")
+		,field("infinispan.client.hotrod.force_return_values","infinispan.client.hotrod.force_return_values",true,false,"default = false. Whether or not to implicitly Flag.FORCE_RETURN_VALUE for all calls.","checkbox","false")
 		,field("infinispan.client.hotrod.tcp_no_delay","infinispan.client.hotrod.tcp_no_delay",true,true,"default = true. Affects TCP NODELAY on the TCP stack.","checkbox","true")
 		,field("infinispan.client.hotrod.ping_on_startup","infinispan.client.hotrod.ping_on_startup",true,true,"default = true. If true, a ping request is sent to a back end server in order to fetch cluster's topology.","checkbox","true")
 		,field("infinispan.client.hotrod.transport_factory","infinispan.client.hotrod.transport_factory","org.infinispan.client.hotrod.impl.transport.tcp.TcpTransportFactory",false,"default = org.infinispan.client.hotrod.impl.transport.tcp.TcpTransportFactory - controls which transport to use. Currently only the TcpTransport is supported.","text")
@@ -19,14 +19,14 @@
 	)>
 
 	<cffunction name="getClass" returntype="string">
-    	<cfreturn "railo.extension.io.cache.infinispan.InfinispanHotRodCache">
+    	<cfreturn "railo.extension.io.cache.infinispan.InfinispanHotRodClientCache">
     </cffunction>
 
 	<cffunction name="getLabel" returntype="string">
-    	<cfreturn "InfinispanHotRodCache">
+    	<cfreturn "Infinispan HotRod Client Cache">
     </cffunction>
 	<cffunction name="getDescription" returntype="string" output="no">
-    	<cfreturn "Infinispan connection">
+    	<cfreturn "Infinispan HotRod client cache connection">
     </cffunction>
 
 </cfcomponent>
