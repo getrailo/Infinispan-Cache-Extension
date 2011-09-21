@@ -1,0 +1,35 @@
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:infinispan:config:5.0 http://www.infinispan.org/schemas/infinispan-config-5.0.xsd"
+	xmlns="urn:infinispan:config:5.0">
+
+	<global>
+		<transport clusterName="railoInfinispanCluster" />
+		<globalJmxStatistics enabled="true" />
+	</global>
+
+	<default>
+		<storeAsBinary enabled="true" />
+		<jmxStatistics enabled="true" />
+		<clustering mode="replication">
+			<sync />
+		</clustering>
+      <!-- 
+      <clustering mode="distribution">
+         <l1 enabled="true" lifespan="60000"/>
+         <hash numOwners="2" rehashRpcTimeout="120000"/>
+         <sync/>
+      </clustering>
+       -->
+	</default>
+
+	<namedCache name="infinispan">
+	</namedCache>
+	<namedCache name="infinispan-session" />
+	<namedCache name="infinispan-client" />
+	<namedCache name="infinispan-template" />
+	<namedCache name="infinispan-query">
+		<eviction maxEntries="5000" strategy="FIFO" />
+		<expiration lifespan="60000" maxIdle="1000" wakeUpInterval="500" />
+	</namedCache>
+
+</infinispan>
