@@ -23,10 +23,10 @@ import railo.runtime.config.Config;
 
 public class InfinispanCacheManager extends DefaultCacheManager {
 
-	private static EmbeddedCacheManager manager;
+	private static DefaultCacheManager manager;
 	private static Boolean starting = false;
 	
-	public static EmbeddedCacheManager getInstance(Config config, Properties properties) {
+	public static DefaultCacheManager getInstance(Config config, Properties properties) {
 		if(!starting && manager == null) {
 			starting = true;
 			if(properties.getProperty("infinispan.config.file") != null && properties.getProperty("infinispan.config.file").toString().length() > 0) {
@@ -76,10 +76,11 @@ public class InfinispanCacheManager extends DefaultCacheManager {
                 String name=eConnection.getAttribute("name");
                 String clazzName=eConnection.getAttribute("class");
                 if(clazzName!=null) clazzName=clazzName.trim();
-                if("railo.extension.io.cache.infinispan.InfinispanClusterCache".equals(clazzName)) {
+                if("railo.extension.io.cache.infinispan.InfinispanCache".equals(clazzName)) {
                 	cacheNames.add(name);
         			//System.out.println("adding cache: " + name);
-        			manager.defineConfiguration(name, new Configuration().fluent()
+        			manager.defineConfiguration(name, new Configuration().fluent().storeAsBinary()
+    						.clustering()
         					  .build());
                 }
                 //System.out.println(clazzName);
@@ -97,7 +98,7 @@ public class InfinispanCacheManager extends DefaultCacheManager {
 	}
 	
 	
-	public static EmbeddedCacheManager reload(Properties properties) {
+	public static DefaultCacheManager reload(Properties properties) {
 		if(manager != null) {
 			manager.stop();
 			manager = null;

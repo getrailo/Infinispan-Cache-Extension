@@ -23,10 +23,10 @@
     </cffunction>
 
 	<cffunction name="getLabel" returntype="string">
-    	<cfreturn "Infinispan HotRod Client Cache">
+    	<cfreturn "Infinispan Hot Rod Client Cache">
     </cffunction>
 	<cffunction name="getDescription" returntype="string" output="no">
-    	<cfreturn "Infinispan HotRod client cache connection">
+    	<cfreturn "Infinispan Hot Rod client cache connection">
     </cffunction>
 
 </cfcomponent>

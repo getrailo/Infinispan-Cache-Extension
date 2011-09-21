@@ -5,7 +5,7 @@
 	)>
 
 	<cffunction name="getClass" returntype="string">
-    	<cfreturn "railo.extension.io.cache.infinispan.InfinispanClusterCache">
+    	<cfreturn "railo.extension.io.cache.infinispan.InfinispanCache">
     </cffunction>
 
 	<cffunction name="getLabel" returntype="string">

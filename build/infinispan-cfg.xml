@@ -3,7 +3,14 @@
 	xmlns="urn:infinispan:config:5.0">
 
 	<global>
-		<transport clusterName="railoInfinispanCluster" />
+		<transport clusterName="railoInfinispanCluster">
+         <properties>
+            <!-- 
+            <property name="configurationFile" value="jgroups-tcp.xml" />
+            -->
+            <property name="configurationFile" value="jgroups-udp.xml" />  
+         </properties>
+		</transport>
 		<globalJmxStatistics enabled="true" />
 	</global>
 
@@ -21,15 +28,5 @@
       </clustering>
        -->
 	</default>
-
-	<namedCache name="infinispan">
-	</namedCache>
-	<namedCache name="infinispan-session" />
-	<namedCache name="infinispan-client" />
-	<namedCache name="infinispan-template" />
-	<namedCache name="infinispan-query">
-		<eviction maxEntries="5000" strategy="FIFO" />
-		<expiration lifespan="60000" maxIdle="1000" wakeUpInterval="500" />
-	</namedCache>
 
 </infinispan>

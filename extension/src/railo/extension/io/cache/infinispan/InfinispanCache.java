@@ -1,29 +1,49 @@
 package railo.extension.io.cache.infinispan;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.xerces.parsers.DOMParser;
+import org.infinispan.config.Configuration;
+import org.infinispan.config.GlobalConfiguration;
+import org.infinispan.manager.CacheContainer;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import railo.commons.io.cache.Cache;
 import railo.commons.io.cache.CacheEntry;
 import railo.commons.io.cache.CacheEntryFilter;
 import railo.commons.io.cache.CacheKeyFilter;
 import railo.commons.io.cache.exp.CacheException;
+import railo.commons.io.res.Resource;
 import railo.extension.io.cache.CacheUtil;
 import railo.extension.io.cache.util.CacheKeyFilterAll;
+import railo.loader.engine.CFMLEngineFactory;
 import railo.runtime.config.Config;
+import railo.runtime.exp.PageException;
 import railo.runtime.type.Struct;
+import railo.runtime.util.Cast;
 
 
 public class InfinispanCache implements Cache {
 
-	org.infinispan.Cache<Object, Object> cache = null;
 	private int hits;
 	private int misses;
+	private ClassLoader classLoader;
+	private String cacheName;
+	private DefaultCacheManager manager;
 
 	public static void init(Config config, String[] cacheNames, Struct[] arguments) throws IOException {
 	}
@@ -39,98 +59,42 @@ public class InfinispanCache implements Cache {
 	}
 
 	public void init(Config config, String cacheName, Struct arguments) throws IOException {
-		ClassLoader cl = config.getClassLoader();
-		// debug
-		/*
-		Key[] keys = arguments.keys();
-		for(int i=0;i<keys.length;i++){
-			System.out.println(keys[i]+":"+arguments.get(keys[i],""));
-		}
-		*/
-		/*
-		Cast cast = CFMLEngineFactory.getInstance().getCastUtil();
+		Cast caster = CFMLEngineFactory.getInstance().getCastUtil();
+		this.classLoader = config.getClassLoader();
+		this.cacheName = cacheName;
+		setClassLoader();
+
+		Iterator propNames = arguments.keyIterator();
+		Properties properties = new Properties();
 		try {
-			String[] servers;
-			String strServers = cast.toString(arguments.get("servers"), null);
-			// backward comaptibility
-			if (strServers == null) {
-				String host = cast.toString(arguments.get("host"));
-				int port = cast.toIntValue(arguments.get("port"));
-				servers = new String[] { host + ":" + port };
-			} else {
-				strServers = strServers.trim();
-				servers = strServers.split("\\s+");
-				for (int i = 0; i < servers.length; i++) {
-					servers[i] = servers[i].trim();
-				}
+			while (propNames.hasNext()) {
+				String propName = caster.toString(propNames.next());
+				properties.setProperty(propName, caster.toString(arguments.get(propName)));
 			}
-
-			// settings
-			int initConn = cast.toIntValue(arguments.get("initial_connections", 1), 1);
-			if (initConn > 0)
-				pool.setInitConn(initConn);
-
-			int minConn = cast.toIntValue(arguments.get("min_spare_connections", 1), 1);
-			if (minConn > 0)
-				pool.setMinConn(minConn);
-
-			int maxConn = cast.toIntValue(arguments.get("max_spare_connections", 32), 32);
-			if (maxConn > 0)
-				pool.setMaxConn(maxConn);
-
-			int maxIdle = cast.toIntValue(arguments.get("max_idle_time", 5), 5);
-			if (maxIdle > 0)
-				pool.setMaxIdle(maxIdle * 1000L);
-
-			int maxBusy = cast.toIntValue(arguments.get("max_busy_time", 30), 30);
-			if (maxBusy > 0)
-				pool.setMaxBusyTime(maxBusy * 1000L);
-
-			int maintSleep = cast.toIntValue(arguments.get("maint_thread_sleep", 5), 5);
-			if (maintSleep > 0)
-				pool.setMaintSleep(maintSleep * 1000L);
-
-			int socketTO = cast.toIntValue(arguments.get("socket_timeout", 3), 3);
-			if (socketTO > 0)
-				pool.setSocketTO(socketTO * 1000);
-
-			int socketConnTO = cast.toIntValue(arguments.get("socket_connect_to", 3), 3);
-			if (socketConnTO > 0)
-				pool.setSocketConnectTO(socketConnTO * 1000);
-
-			pool.setFailover(cast.toBooleanValue(arguments.get("failover", false), false));
-			pool.setFailback(cast.toBooleanValue(arguments.get("failback", false), false));
-			pool.setNagle(cast.toBooleanValue(arguments.get("nagle_alg", false), false));
-			pool.setAliveCheck(cast.toBooleanValue(arguments.get("alive_check", false), false));
-
-			int bufferSize = cast.toIntValue(arguments.get("buffer_size", false));
-			if (bufferSize > 0)
-				pool.setBufferSize(bufferSize * 1024 * 1024);
-
-			// pool.setHashingAlg(SockIOPool.NEW_COMPAT_HASH);
-
-			pool.setServers(servers);
-			pool.initialize();
-		} catch (Exception e) {
-			throw new IOException(e.getMessage());
+		} catch (PageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		*/
-		ClassLoader ocl = Thread.currentThread().getContextClassLoader();
-		System.out.println("TCCL is " + ocl);
-	    Thread.currentThread().setContextClassLoader(cl);
-	    System.out.println("TCCL is " + cl);
-		EmbeddedCacheManager manager = new DefaultCacheManager();
-		cache = manager.getCache();
-	    Thread.currentThread().setContextClassLoader(ocl);
-		//EmbeddedCacheManager manager = new DefaultCacheManager();
-		
+		manager = InfinispanCacheManager.getInstance(config, properties);
+//		Configuration c = manager.getDefaultConfiguration().clone();
+//		manager.defineConfiguration(cacheName, c);
+	}
+
+	private void setClassLoader() {
+		if (classLoader != Thread.currentThread().getContextClassLoader())
+			Thread.currentThread().setContextClassLoader(classLoader);
+	}
+	
+	private org.infinispan.Cache<Object, Object> getCache() {
+		setClassLoader();
+		return manager.getCache(cacheName);
 	}
 
 	/**
 	 * @see railo.commons.io.cache.Cache#contains(java.lang.String)
 	 */
 	public boolean contains(String key) {
-		return cache.containsKey(key);
+		return getCache().containsKey(key);
 	}
 
 	/**
@@ -145,7 +109,7 @@ public class InfinispanCache implements Cache {
 	 * @see railo.commons.io.cache.Cache#getCacheEntry(java.lang.String)
 	 */
 	public CacheEntry getCacheEntry(String key) throws CacheException {
-		Object value = cache.get(key);
+		Object value = getCache().get(key);
 		if (value == null) {
 			misses++;
 			throw new CacheException("there is no entry with key [" + key + "] in cache");
@@ -158,7 +122,7 @@ public class InfinispanCache implements Cache {
 	 * @see railo.commons.io.cache.Cache#getCacheEntry(java.lang.String, railo.commons.io.cache.CacheEntry)
 	 */
 	public CacheEntry getCacheEntry(String key, CacheEntry defaultValue) {
-		Object value = cache.get(key);
+		Object value = getCache().get(key);
 		if (value == null) {
 			misses++;
 			return defaultValue;
@@ -171,7 +135,7 @@ public class InfinispanCache implements Cache {
 	 * @see railo.commons.io.cache.Cache#getValue(java.lang.String)
 	 */
 	public Object getValue(String key) throws CacheException {
-		Object value = cache.get(key);
+		Object value = getCache().get(key);
 		if (value == null) {
 			misses++;
 			throw new CacheException("there is no entry with key [" + key + "] in cache");
@@ -184,7 +148,7 @@ public class InfinispanCache implements Cache {
 	 * @see railo.commons.io.cache.Cache#getValue(java.lang.String, java.lang.Object)
 	 */
 	public Object getValue(String key, Object defaultValue) {
-		Object value = cache.get(key);
+		Object value = getCache().get(key);
 		if (value == null) {
 			misses++;
 			return defaultValue;
@@ -212,9 +176,9 @@ public class InfinispanCache implements Cache {
 	 */
 	public void put(String key, Object value, Long idleTime, Long until) {
 		if (until == null) {
-			cache.put(key, value);
+			getCache().put(key, value);
 		} else {
-			cache.put(key, value, until.longValue() + System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+			getCache().put(key, value, until.longValue() + System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 		}
 
 	}
@@ -223,8 +187,8 @@ public class InfinispanCache implements Cache {
 	 * @see railo.commons.io.cache.Cache#remove(java.lang.String)
 	 */
 	public boolean remove(String key) {
-		if (cache.containsKey(key)) {
-			cache.remove(key);
+		if (getCache().containsKey(key)) {
+			getCache().remove(key);
 			return true;
 		} else
 			return false;
@@ -238,14 +202,14 @@ public class InfinispanCache implements Cache {
 	 */
 	public int remove(CacheKeyFilter filter) {
 		if (CacheKeyFilterAll.equalTo(filter)) {
-			cache.clear();
+			getCache().clear();
 			return -1;
 		}
 		throw notSupported("remove:key filter");
 	}
 
 	public void clear() {
-		cache.clear();
+		getCache().clear();
 	}
 
 	/**
@@ -286,7 +250,7 @@ public class InfinispanCache implements Cache {
 		String key;
 		while(it.hasNext()){
 			key=(String) it.next();
-			list.add(cache.get(key));
+			list.add(getCache().get(key));
 		}
 		return list;
 	}
@@ -327,7 +291,7 @@ public class InfinispanCache implements Cache {
 	 * @see railo.commons.io.cache.Cache#keys()
 	 */
 	public List keys() {
-		List<Object> list = new ArrayList(cache.keySet());
+		List<Object> list = new ArrayList(getCache().keySet());
 		return list;
 	}
 
