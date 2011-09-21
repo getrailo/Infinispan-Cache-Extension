@@ -67,6 +67,7 @@ public class InfinispanHotRodClientCache implements Cache {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//properties.put("infinispan.client.hotrod.marshaller","org.infinispan.client.hotrod.marshall.ApacheAvroMarshaller");
 		manager = InfinispanHotRodManager.getInstance(properties);
 		/*
 				infinispan.client.hotrod.request_balancing_strategy, default = org.infinispan.client.hotrod.impl.transport.tcp.RoundRobinBalancingStrategy. For replicated (vs distributed) Hot Rod server clusters, the client balances requests to the servers according to this strategy.

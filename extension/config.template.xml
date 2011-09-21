@@ -3,14 +3,14 @@
 	<info>
 		<id>35979260-BD0B-11DF-851A-0800200C9A66</id>
 		<version>{version}</version>
-		<name>Infinispan Cache</name>
+		<name>Infinispan</name>
 		<type>all</type>
-		<label>Infinispan Cache</label>
-		<description>Infinispan Cache Extension</description>
+		<label>Infinispan</label>
+		<description>Infinispan Cache and Hot Rod Client Extension</description>
 		<created>{created}</created> 
 		<category>Core</category>
 		<author>Denny Valliant</author>
-		<image>https://docs.jboss.org/author/download/attachments/3737207/ISPN</image>
+		<image>http://wiki.getrailo.org/contentimages/infinispan.png</image>
 		<mailinglist>http://groups.google.com/group/railo-beta</mailinglist>
 		<support>http://groups.google.com/group/railo-beta</support>
 		<documentation>http://wiki.getrailo.com/wiki/extensions:infinispan</documentation>

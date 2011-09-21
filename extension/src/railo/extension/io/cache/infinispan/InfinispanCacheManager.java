@@ -29,65 +29,73 @@ public class InfinispanCacheManager extends DefaultCacheManager {
 	public static EmbeddedCacheManager getInstance(Config config, Properties properties) {
 		if(!starting && manager == null) {
 			starting = true;
-			manager = new DefaultCacheManager(
-			         GlobalConfiguration.getClusteredDefault()
-			            .fluent()
-			               .transport()
-			                  //.addProperty("configurationFile", "jgroups-tcp.xml")
-			                  .addProperty("configurationFile", "jgroups-udp.xml")
-							    .machineId("qa-machine").rackId("qa-rack")
-							    .clusterName("railoInfinispanCluster")
-			               .build(), 
-			         new Configuration()
-			            .fluent()
-			            .storeAsBinary()
-			               .clustering()
-			                  .mode(Configuration.CacheMode.REPL_SYNC)
+			if(properties.getProperty("infinispan.config.file") != null && properties.getProperty("infinispan.config.file").toString().length() > 0) {
+				try {
+					manager = new DefaultCacheManager(properties.getProperty("infinispan.config.file").toString());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				manager = new DefaultCacheManager(
+						GlobalConfiguration.getClusteredDefault()
+						.fluent()
+						.transport()
+						//.addProperty("configurationFile", "jgroups-tcp.xml")
+						.addProperty("configurationFile", "jgroups-udp.xml")
+						//.machineId("railo")
+						.rackId("rack-o-railo")
+						.clusterName("railoInfinispanCluster")
+						.build(), 
+						new Configuration()
+						.fluent()
+						.storeAsBinary()
+						.clustering()
+						.mode(Configuration.CacheMode.REPL_SYNC)
+							.sync()
 //							    .mode(Configuration.CacheMode.DIST_SYNC)
-//							    .sync()
 //							    .l1().lifespan(25000L)
 //							    .hash().numOwners(3)
-			               .build()
-			         ,false);
-
-			Element eCache = null;
-	        try {
-				eCache=getChildByName(loadDocument(config.getConfigFile().getInputStream()).getDocumentElement(),"cache");
-		    	Element[] eConnections=getChildren(eCache,"connection");
-		    	List cacheNames = new LinkedList();
-				for(int i=0;i<eConnections.length;i++) {
-	                Element eConnection=eConnections[i];
-	                String name=eConnection.getAttribute("name");
-	                String clazzName=eConnection.getAttribute("class");
-	                if(clazzName!=null) clazzName=clazzName.trim();
-	                if("railo.extension.io.cache.infinispan.InfinispanClusterCache".equals(clazzName)) {
-	                	cacheNames.add(name);
-            			//System.out.println("adding cache: " + name);
-            			manager.defineConfiguration(name, new Configuration().fluent()
-            					  .build());
-	                }
-	                //System.out.println(clazzName);
-				}
-				manager.startCaches((String[]) cacheNames.toArray(new String[0]));
-
-			} catch (SAXException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+						.build()
+						,false);
 			}
-
-//			try {
-//				manager = new DefaultCacheManager(properties.getProperty("infinispan.config.file").toString());
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
+			startCaches(config);
 
 		}
 
 		return manager;
 	}
+
+	public static void startCaches(Config config) {
+		Element eCache = null;
+        try {
+			eCache=getChildByName(loadDocument(config.getConfigFile().getInputStream()).getDocumentElement(),"cache");
+	    	Element[] eConnections=getChildren(eCache,"connection");
+	    	List cacheNames = new LinkedList();
+			for(int i=0;i<eConnections.length;i++) {
+                Element eConnection=eConnections[i];
+                String name=eConnection.getAttribute("name");
+                String clazzName=eConnection.getAttribute("class");
+                if(clazzName!=null) clazzName=clazzName.trim();
+                if("railo.extension.io.cache.infinispan.InfinispanClusterCache".equals(clazzName)) {
+                	cacheNames.add(name);
+        			//System.out.println("adding cache: " + name);
+        			manager.defineConfiguration(name, new Configuration().fluent()
+        					  .build());
+                }
+                //System.out.println(clazzName);
+			}
+			manager.startCaches((String[]) cacheNames.toArray(new String[0]));
+
+		} catch (SAXException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	
 	public static EmbeddedCacheManager reload(Properties properties) {
 		if(manager != null) {
