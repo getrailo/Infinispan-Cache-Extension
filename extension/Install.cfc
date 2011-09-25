@@ -4,7 +4,7 @@
 		variables.name = "Infinispan Cache";
 		variables.id = "railo.extension.io.cache.infinispanpan.InfinispanCache";
 		variables.jar = "infinispan-cache.jar";
-		variables.drivers = "InfinispanClusterCache.cfc,InfinispanHotRodClientCache.cfc";
+		variables.drivers = "InfinispanCache.cfc,InfinispanHotRodClientCache.cfc";
 		variables.jars = "#variables.jar#,commons-pool-1.5.4.jar,infinispan-client-hotrod.jar,infinispan-core.jar,jboss-logging-3.0.0.GA.jar,jboss-marshalling-1.3.0.GA.jar,jboss-marshalling-river-1.3.0.GA.jar,jboss-transaction-api-1.0.1.GA.jar,jcip-annotations-1.0.jar,jgroups-2.12.1.3.Final.jar,log4j-1.2.16.jar,org.osgi.core-4.3.0.jar,paranamer-generator-2.2.jar,rhq-pluginAnnotations-3.0.1.jar";
 	</cfscript>
 
@@ -30,11 +30,18 @@
             destination="#getContextPath()#/lib/#i#">
 		</cfloop>
 
+		<cfif !directoryExists("#getContextPath()#/admin/cdriver/")>
+			<cfset directoryCreate("#getContextPath()#/admin/cdriver/",true)>
+		</cfif>
 		<cfloop list="#variables.drivers#" index="i">
 			<cffile
 			action="copy"
 			source="#path#driver/#i#"
-			destination="#getContextPath()#/context/admin/cdriver/#i#">
+			destination="#getContextPath()#/admin/cdriver/#i#">
+			<cffile
+			action="copy"
+			source="#path#driver/#i#"
+			destination="#expandPath('{railo-web}')#/context/admin/cdriver/#i#">
 		</cfloop>
 
         <cfreturn '#variables.name# is now successfully installed'>
@@ -74,7 +81,7 @@
  --->
 	        <cffile
 	        action="delete"
-	        file="#getContextPath()#/context/admin/cdriver/#i#">
+	        file="#getContextPath()#/admin/cdriver/#i#">
 		</cfloop>
 
         <cfreturn '#variables.name# is now successfully removed'>

@@ -50,8 +50,8 @@ public class InfinispanCacheManager extends DefaultCacheManager {
 						.fluent()
 						.storeAsBinary()
 						.clustering()
-						.mode(Configuration.CacheMode.REPL_SYNC)
-							.sync()
+							.mode(Configuration.CacheMode.REPL_SYNC)
+								.sync()
 //							    .mode(Configuration.CacheMode.DIST_SYNC)
 //							    .l1().lifespan(25000L)
 //							    .hash().numOwners(3)
@@ -62,6 +62,10 @@ public class InfinispanCacheManager extends DefaultCacheManager {
 
 		}
 
+		return manager;
+	}
+
+	public static DefaultCacheManager getManager() {
 		return manager;
 	}
 

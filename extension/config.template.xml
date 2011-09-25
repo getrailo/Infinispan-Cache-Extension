@@ -3,11 +3,11 @@
 	<info>
 		<id>35979260-BD0B-11DF-851A-0800200C9A66</id>
 		<version>{version}</version>
-		<name>Infinispan</name>
+		<name>InfinispanCache</name>
 		<type>all</type>
-		<label>Infinispan</label>
-		<description>Infinispan Cache and Hot Rod Client Extension</description>
-		<created>{created}</created> 
+		<label>Infinispan Cache</label>
+		<description>The Infinispan extension allows you to create Infinispan caches, and acces remote caches via the Hot Rod Protocol (which is compatible with Java, Python, PHP, Ruby, etc. as well).</description>
+		<created>{created}</created>
 		<category>Core</category>
 		<author>Denny Valliant</author>
 		<image>http://wiki.getrailo.org/contentimages/infinispan.png</image>
