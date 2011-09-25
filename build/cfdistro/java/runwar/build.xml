@@ -115,7 +115,7 @@
 		<antcontrib:runtarget target="runwar.start" />
 	</target>
 
-	<target name="runwar.start" depends="runwar.jar" description="starts jetty-runner server">
+	<target name="runwar.start" description="starts jetty-runner server">
 		<runwar.initprops />
 		<echoproperties prefix="runwar"/>
 		<property name="background" value="true" />

@@ -183,7 +183,7 @@ sudo ifconfig lo0 alias 10.196.110.42
 		</antcontrib:if>
 		<echo message="Creating infinispan.sh script.  To run it type: ./infinispan.sh" />
 		<relpath root="${basedir}" full-path="${infinispan.dir}" property="infinispan.dir"/>
-		<relpath root="${basedir}" full-path="${basedir}/infinispan-cfg.xml" property="infinispan.config"/>
+		<relpath root="${basedir}" full-path="${basedir}/infinispan-hotrod-cfg.xml" property="infinispan.config"/>
 		<echo file="${basedir}/infinispan.sh"><![CDATA[#! /bin/sh
 ${infinispan.dir}/bin/startServer.sh -r hotrod -c ${infinispan.config} -l ${server.host}]]></echo>
 		<chmod file="${basedir}/infinispan.sh" perm="ugo+rx"/>

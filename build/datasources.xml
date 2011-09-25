@@ -1,7 +1,7 @@
 <datasources>
-
+<!-- 
 	<datasource 
-		name="railo-infinispan" 
+		name="JUDCon" 
 		class="org.h2.Driver" 
 		host="localhost" 
 		port="3306" 
@@ -49,4 +49,6 @@
 		jdbc="mysql"
 		jdbcstring="jdbc:mysql://${dsn.mangoblog.host}:3306/mangoblog"
 		 />
+ -->
+ 
 </datasources>
